@@ -1,0 +1,170 @@
+// src/pages/UserManagement.jsx
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
+import UserDetailModal from '../components/UserDetailModal';
+
+const getStatusClasses = (status) => {
+  switch (status) {
+    case 'approved':
+      return 'bg-green-100 text-green-800';
+    case 'fully_verified':
+      return 'bg-blue-100 text-blue-800';
+    case 'pending_approval':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'suspended':
+      return 'bg-purple-100 text-purple-800';
+    default:
+      return 'bg-red-100 text-red-800';
+  }
+};
+
+const UserManagement = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const { data, error } = await supabase.from('users').select('*');
+      if (error) throw error;
+      setUsers(data || []);
+    } catch (err) {
+      setError('Failed to fetch users.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleUpdateStatus = async (userId, newStatus) => {
+    if (!window.confirm(`Are you sure you want to set this user's status to "${newStatus}"?`)) {
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ status: newStatus })
+        .eq('id', userId);
+      if (error) throw error;
+      setUsers(currentUsers =>
+        currentUsers.map(user =>
+          user.id === userId ? { ...user, status: newStatus } : user
+        )
+      );
+      alert(`User status updated to ${newStatus}.`);
+    } catch (err) {
+      alert('Failed to update user status.');
+      console.error(err);
+    }
+  };
+  
+  const handleViewDetails = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
+  };
+  
+  const handleFullVerification = (userId) => {
+    handleUpdateStatus(userId, 'fully_verified');
+    handleCloseModal();
+  };
+
+  const filteredUsers = users.filter(user =>
+    (user.email?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    // We also search by full_name now
+    (user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  if (loading) return <div>Loading users...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">User Management</h1>
+        <input
+          type="text"
+          placeholder="Search by email or name..."
+          className="px-4 py-2 border rounded-md"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      <div className="bg-white shadow-md rounded-lg overflow-x-auto">
+        <table className="min-w-full leading-normal">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Email</th>
+              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Display Name</th>
+              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Registered On</th>
+              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Status</th>
+              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredUsers.length > 0 ? filteredUsers.map(user => (
+              <tr key={user.id} className="hover:bg-gray-50">
+                <td className="px-5 py-4 border-b text-sm">{user.email}</td>
+                {/* 1. This now correctly displays the user's full_name */}
+                <td className="px-5 py-4 border-b text-sm">{user.full_name || 'N/A'}</td>
+                {/* 2. This now displays the full date and time */}
+                <td className="px-5 py-4 border-b text-sm">{user.created_at ? new Date(user.created_at).toLocaleString() : 'N/A'}</td>
+                <td className="px-5 py-4 border-b text-sm">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(user.status)}`}>
+                    {user.status ? user.status.replace(/_/g, ' ') : 'N/A'}
+                  </span>
+                </td>
+                <td className="px-5 py-4 border-b text-sm">
+                  <div className="flex items-center space-x-4">
+                    <button onClick={() => handleViewDetails(user)} className="text-gray-500 hover:text-blue-600" title="View Details">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                    {user.status === 'suspended' ? (
+                      <button onClick={() => handleUpdateStatus(user.id, 'approved')} className="text-green-600 hover:underline">
+                        Reactivate
+                      </button>
+                    ) : (
+                      <button onClick={() => handleUpdateStatus(user.id, 'suspended')} className="text-red-600 hover:underline">
+                        Suspend
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            )) : (
+              <tr>
+                <td colSpan="5" className="text-center py-4">No users found.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {isModalOpen && selectedUser && (
+        <UserDetailModal
+          user={selectedUser}
+          onClose={handleCloseModal}
+          onVerify={handleFullVerification}
+        />
+      )}
+    </div>
+  );
+};
+
+export default UserManagement;

@@ -1,0 +1,47 @@
+.pageContainer {
+  @apply container mx-auto;
+}
+
+.pageTitle {
+  @apply text-2xl font-semibold mb-6;
+}
+
+.card {
+  @apply bg-white p-6 rounded-lg shadow-md;
+}
+
+.tableContainer {
+  @apply bg-white shadow-md rounded-lg overflow-x-auto;
+}
+
+.table {
+  @apply min-w-full leading-normal;
+}
+
+.tableHead {
+  @apply bg-gray-100;
+}
+
+.th {
+  @apply px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase;
+}
+
+.tableRow {
+  @apply hover:bg-gray-50;
+}
+
+.td {
+  @apply px-5 py-4 border-b text-sm;
+}
+
+.actionsCell {
+  @apply space-x-2;
+}
+
+.approveButton {
+  @apply bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-xs;
+}
+
+.rejectButton {
+  @apply bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs;
+}
