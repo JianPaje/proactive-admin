@@ -1,4 +1,3 @@
-// src/pages/UserManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import UserDetailModal from '../components/UserDetailModal';
@@ -30,8 +29,8 @@ const UserManagement = () => {
     setLoading(true);
     setError('');
     try {
-      const { data, error } = await supabase.from('users').select('*');
-      if (error) throw error;
+      const { data, error: fetchError } = await supabase.from('users').select('*');
+      if (fetchError) throw fetchError;
       setUsers(data || []);
     } catch (err) {
       setError('Failed to fetch users.');
@@ -45,21 +44,29 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
+  // MODIFIED: This function now also updates the selectedUser state
   const handleUpdateStatus = async (userId, newStatus) => {
     if (!window.confirm(`Are you sure you want to set this user's status to "${newStatus}"?`)) {
       return;
     }
     try {
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('users')
         .update({ status: newStatus })
         .eq('id', userId);
-      if (error) throw error;
-      setUsers(currentUsers =>
-        currentUsers.map(user =>
-          user.id === userId ? { ...user, status: newStatus } : user
-        )
+      if (updateError) throw updateError;
+      
+      const updatedUsers = users.map(user =>
+        user.id === userId ? { ...user, status: newStatus } : user
       );
+      setUsers(updatedUsers);
+
+      // If the updated user is the one currently selected in the modal,
+      // update the selectedUser state as well to refresh the modal.
+      if (selectedUser && selectedUser.id === userId) {
+        setSelectedUser(prevUser => ({ ...prevUser, status: newStatus }));
+      }
+
       alert(`User status updated to ${newStatus}.`);
     } catch (err) {
       alert('Failed to update user status.');
@@ -79,13 +86,13 @@ const UserManagement = () => {
   
   const handleFullVerification = (userId) => {
     handleUpdateStatus(userId, 'fully_verified');
-    handleCloseModal();
+    // We don't need to close the modal anymore, it will update automatically
+    // handleCloseModal(); 
   };
 
   const filteredUsers = users.filter(user =>
     (user.email?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    // We also search by full_name now
-    (user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()))
+    (user.display_name?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   if (loading) return <div>Loading users...</div>;
@@ -118,9 +125,7 @@ const UserManagement = () => {
             {filteredUsers.length > 0 ? filteredUsers.map(user => (
               <tr key={user.id} className="hover:bg-gray-50">
                 <td className="px-5 py-4 border-b text-sm">{user.email}</td>
-                {/* 1. This now correctly displays the user's full_name */}
-                <td className="px-5 py-4 border-b text-sm">{user.full_name || 'N/A'}</td>
-                {/* 2. This now displays the full date and time */}
+                <td className="px-5 py-4 border-b text-sm">{user.display_name || 'N/A'}</td>
                 <td className="px-5 py-4 border-b text-sm">{user.created_at ? new Date(user.created_at).toLocaleString() : 'N/A'}</td>
                 <td className="px-5 py-4 border-b text-sm">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(user.status)}`}>

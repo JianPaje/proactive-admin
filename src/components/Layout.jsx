@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header'; 
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hook/useAuth';
 
 const Layout = () => {
   const { user } = useAuth();
-  // Create a state variable to track if the sidebar is open.
+ 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (!user) {

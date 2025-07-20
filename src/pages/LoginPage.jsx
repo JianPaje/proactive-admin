@@ -1,15 +1,14 @@
 // src/pages/LoginPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hook/useAuth';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  // We don't need the 'login' function from the context anymore,
-  // as we are handling the logic directly here.
+
   const { supabase } = useAuth(); 
   const navigate = useNavigate();
 
@@ -19,17 +18,17 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // Step 1: Attempt to sign in the user
+     
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (signInError) {
-        throw signInError; // If login fails, throw the error
+        throw signInError; 
       }
 
-      // Step 2: If login is successful, immediately check their role
+    
       if (data.user) {
         const { data: profileData, error: profileError } = await supabase
           .from('users')
@@ -41,12 +40,12 @@ const LoginPage = () => {
           throw profileError;
         }
 
-        // Step 3: Check if the role is 'admin'
+   
         if (profileData && profileData.role === 'admin') {
-          // Success! The user is an admin. Navigate to the dashboard.
+          
           navigate('/admin/dashboard');
         } else {
-          // Not an admin. Log them out immediately and show an error.
+          
           await supabase.auth.signOut();
           throw new Error('You do not have permission to access this panel.');
         }
@@ -64,7 +63,7 @@ const LoginPage = () => {
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Admin Login</h2>
         {error && <p className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
-          {/* The form inputs remain the same */}
+    
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">Email</label>
             <input

@@ -1,17 +1,17 @@
 // src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from './Contexts/AuthProvider';
 
-// Import Components and Pages
+
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
-import AboutUs from './pages/AboutUs'; // 1. IMPORT THE NEW PAGE
+import AboutUs from './pages/AboutUs';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
-import UserVerification from './pages/UserVerification';
 import Reports from './pages/Reports';
 import UserManagement from './pages/UserManagement';
+import RegistrationPage from './pages/RegistrationPage'; 
 
 function App() {
   return (
@@ -20,14 +20,14 @@ function App() {
         <Routes>
           {/* --- PUBLIC ROUTES --- */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutUs />} /> {/* 2. ADD THE NEW ROUTE */}
+          <Route path="/about" element={<AboutUs />} />
           <Route path="/admin/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegistrationPage />} /> {/* <-- 2. ADD THE NEW ROUTE */}
 
 
           {/* --- PROTECTED ADMIN ROUTES --- */}
           <Route element={<Layout />}>
             <Route path="/admin/dashboard" element={<DashboardPage />} />
-            <Route path="/admin/user-verification" element={<UserVerification />} />
             <Route path="/admin/user-management" element={<UserManagement />} />
             <Route path="/admin/reports" element={<Reports />} />
           </Route>

@@ -1,4 +1,3 @@
-// src/components/UserDetailModal.jsx
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
@@ -8,6 +7,29 @@ const UserDetailModal = ({ user, onClose, onVerify }) => {
   if (!user) {
     return null;
   }
+
+  const formatBirthday = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    } catch (e) {
+      console.error("Error formatting birthday date:", e);
+      return dateString;
+    }
+  };
+
+  // --- START FIX FOR NESTED TERNARY ---
+  // Extract the logic for the alt text into a variable
+  const idImageAltText = (() => {
+    if (user.id_type === 'Passport') {
+      return isIdFlipped ? 'Passport Image (flipped)' : 'Passport Image (front)';
+    } else {
+      // For non-passport IDs, determine alt text based on flip state
+      return isIdFlipped ? 'Verified ID Back' : 'Verified ID Front';
+    }
+  })();
+  // --- END FIX FOR NESTED TERNARY ---
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -22,26 +44,31 @@ const UserDetailModal = ({ user, onClose, onVerify }) => {
           <div className="md:col-span-1 space-y-4">
             <div>
               <h3 className="font-semibold mb-2">Profile Picture</h3>
-              <img src={user.profile_pic || 'https://placehold.co/400x400?text=No+Image'} alt="Profile" className="w-full h-auto rounded-lg border" />
+              <img src={user.selfie_image_url || 'https://placehold.co/400x400?text=No+Image'} alt="Profile" className="w-full h-auto rounded-lg border" />
             </div>
             <div>
               <h3 className="font-semibold mb-2">Verified ID Image</h3>
               <p className="text-xs text-gray-500 mb-1">Click image to flip</p>
               
-              {/* --- THIS IS THE MODIFIED PART --- */}
-              {/* We changed the <div> to a <button> for accessibility */}
               <button
                 type="button"
                 onClick={() => setIsIdFlipped(!isIdFlipped)}
                 className="block w-full border rounded-lg overflow-hidden text-left focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-label="Flip ID card to see other side"
               >
+                <span className="sr-only">
+                    {/* Use the extracted variable here */}
+                    {idImageAltText} 
+                </span>
                 {isIdFlipped ? (
-                  <img src={user.verified_id_image_back || 'https://placehold.co/400x250?text=ID+Back'} alt="Verified ID Back" className="w-full h-auto" />
+                  <img src={user.id_back_url || 'https://placehold.co/400x250?text=ID+Back'} alt="Verified ID Back" className="w-full h-auto" />
                 ) : (
-                  <img src={user.verified_id_image || 'https://placehold.co/400x250?text=ID+Front'} alt="Verified ID Front" className="w-full h-auto" />
+                  <img src={user.id_front_url || 'https://placehold.co/400x250?text=ID+Front'} alt="Verified ID Front" className="w-full h-auto" />
                 )}
               </button>
+              <p className="text-sm text-gray-700 mt-2">
+                <strong>ID Type:</strong> {user.id_type || 'N/A'}
+              </p>
             </div>
           </div>
 
@@ -49,7 +76,7 @@ const UserDetailModal = ({ user, onClose, onVerify }) => {
           <div className="md:col-span-2 space-y-4">
             <div>
               <span className="text-sm font-bold text-gray-600">Full Name</span>
-              <p className="text-lg">{user.full_name || 'N/A'}</p>
+              <p className="text-lg">{user.display_name || 'N/A'}</p>
             </div>
             <div>
               <span className="text-sm font-bold text-gray-600">Email Address</span>
@@ -63,6 +90,20 @@ const UserDetailModal = ({ user, onClose, onVerify }) => {
               <span className="text-sm font-bold text-gray-600">Address</span>
               <p className="text-lg">{user.address || 'N/A'}</p>
             </div>
+            <div>
+              <span className="text-sm font-bold text-gray-600">Birthday</span>
+              <p className="text-lg">{formatBirthday(user.birthday)}</p>
+            </div>
+            <div>
+              <span className="text-sm font-bold text-gray-600">Postal Code</span>
+              <p className="text-lg">{user.postal_code || 'N/A'}</p>
+            </div>
+            <div>
+              <span className="text-sm font-bold text-gray-600">Current Status</span>
+              <p className="text-lg capitalize">
+                {user.status ? user.status.replace(/_/g, ' ') : 'N/A'}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -73,29 +114,34 @@ const UserDetailModal = ({ user, onClose, onVerify }) => {
           >
             Close
           </button>
-          <button
-            onClick={() => onVerify(user.id)}
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded"
-          >
-            Set as Fully Verified
-          </button>
+          {user.status !== 'fully_verified' && (
+            <button
+              onClick={() => onVerify(user.id)}
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded"
+            >
+              Set as Fully Verified
+            </button>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-// PropTypes validation remains the same
 UserDetailModal.propTypes = {
   user: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    profile_pic: PropTypes.string,
-    verified_id_image: PropTypes.string,
-    verified_id_image_back: PropTypes.string,
-    full_name: PropTypes.string,
+    selfie_image_url: PropTypes.string,
+    id_front_url: PropTypes.string,
+    id_back_url: PropTypes.string,
+    display_name: PropTypes.string,
     email: PropTypes.string,
     phone_number: PropTypes.string,
     address: PropTypes.string,
+    status: PropTypes.string,
+    id_type: PropTypes.string,
+    birthday: PropTypes.string,
+    postal_code: PropTypes.string,
   }).isRequired,
   onClose: PropTypes.func.isRequired,
   onVerify: PropTypes.func.isRequired,

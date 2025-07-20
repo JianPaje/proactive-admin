@@ -1,10 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types'; 
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hook/useAuth';
 
 const Sidebar = ({ isOpen }) => {
   const { logout } = useAuth();
-  // 2. Get the navigate function by calling the hook
   const navigate = useNavigate();
 
   const linkClasses = "block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700";
@@ -14,14 +14,13 @@ const Sidebar = ({ isOpen }) => {
     return isActive ? `${linkClasses} ${activeLinkClasses}` : linkClasses;
   };
 
-  //This function ensures you go to the homepage AFTER logging out
   const handleLogout = async () => {
     try {
-      await logout(); // Sign the user out from Supabase
-      navigate('/');   // Immediately redirect to the homepage
+      await logout();
+      navigate('/');
     } catch (error) {
       console.error('Failed to log out:', error);
-      navigate('/'); // Redirect to homepage even if there was an error
+      navigate('/');
     }
   };
 
@@ -39,9 +38,7 @@ const Sidebar = ({ isOpen }) => {
           <NavLink to="/admin/dashboard" end className={getNavLinkClass}>
             Dashboard
           </NavLink>
-          <NavLink to="/admin/user-verification" className={getNavLinkClass}>
-            User Verification
-          </NavLink>
+          {/* MODIFIED: The User Verification link has been removed */}
           <NavLink to="/admin/user-management" className={getNavLinkClass}>
             User Management
           </NavLink>
@@ -51,7 +48,6 @@ const Sidebar = ({ isOpen }) => {
         </nav>
       </div>
       <div className="mt-auto">
-        {/* The button now calls our new handleLogout function */}
         <button
           onClick={handleLogout}
           className="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -61,6 +57,10 @@ const Sidebar = ({ isOpen }) => {
       </div>
     </div>
   );
+};
+
+Sidebar.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
 };
 
 export default Sidebar;

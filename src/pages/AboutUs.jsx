@@ -22,7 +22,14 @@ const AboutUs = () => {
         </h1>
 
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md space-y-6">
-          
+
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">About Us</h2>
+            <p className="text-gray-600 leading-relaxed">
+              We are a team of 3rd-year students from AMA Computer College Fairview (AMACC-Fairview). We developed RetroConnect as an innovative application to empower users to easily buy, sell, and even barter both brand new and pre-owned items. Our goal is to provide a seamless and secure platform that promotes a sustainable circular economy within the Filipino community.
+            </p>
+          </div>
+
           <div>
             <h2 className="text-2xl font-semibold text-gray-700 mb-4">Our Mission</h2>
             <p className="text-gray-600 leading-relaxed">
@@ -41,27 +48,22 @@ const AboutUs = () => {
             <h2 className="text-2xl font-semibold text-gray-700 mb-4">Our Unique Features</h2>
             <ul className="list-disc list-inside text-gray-600 space-y-2">
               <li>
-                <strong>Barter System:</strong> Enabling users to exchange items directly without the need for money, facilitating a unique way to trade.
+                Barter System: Enabling users to exchange items directly without the need for money, facilitating a unique way to trade.
               </li>
               <li>
-                <strong>Local Pick-up Map:</strong> Allowing users to easily find and transact with sellers in their local area for urgent needs and in-person item verification.
+                Local Pick-up Map: Allowing users to easily find and transact with sellers in their local area for urgent needs and in-person item verification.
               </li>
               <li>
-                <strong>Virtual Closet Integration:</strong> Helping users organize and style their digital wardrobe to better coordinate outfits before purchasing.
-              </li>
-               <li>
-                <strong>Repair and Upcycling Services:</strong> Connecting users with nearby repair shops to fix and give new life to secondhand goods.
+                Repair and Upcycling Services: Connecting users with nearby repair shops to fix and give new life to secondhand goods.
               </li>
               <li>
-                <strong>Sell or Donate Option:</strong> Providing a convenient way for sellers to declutter by listing unsold items as donations for the community.
+                sell or Donate Option: Providing a convenient way for sellers to declutter by listing unsold items as donations for the community.
               </li>
-               <li>
-                <strong>Social Sharing & Communication:</strong> Building trust and community through shared item photos, reviews, and direct video/text communication between buyers and sellers.
+              <li>
+                Social Sharing & Communication: Building trust and community through shared item photos, reviews, and direct video/text communication between buyers and sellers.
               </li>
             </ul>
           </div>
-
-
         </div>
 
         <div className="text-center mt-12">

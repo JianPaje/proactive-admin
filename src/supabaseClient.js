@@ -1,7 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://qsyxpglzvwnqbddiflpv.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzeXhwZ2x6dnducWJkZGlmbHB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk4MzI4MjYsImV4cCI6MjA2NTQwODgyNn0.l-eKor_9AEoS1d3FOvd1u3ETx-GqHeju-ucQRJA7rhM';
+import { createClient } from '@supabase/supabase-js'
 
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseUrl = 'https://jepglpevldstkeoxcntu.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcGdscGV2bGRzdGtlb3hjbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5OTQ0MjAsImV4cCI6MjA2NzU3MDQyMH0.C88kAz7PvveZzDFpT7oXEu5H_F2V3TA76rUXJ30sUXk'
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)

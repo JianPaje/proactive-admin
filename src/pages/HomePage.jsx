@@ -1,6 +1,6 @@
 import React from 'react';
 import logo from '../assets/logo.png';
-import appScreenshot from '../assets/th.jpg'; 
+import appScreenshot from '../assets/RetroPic.jpeg'; 
 
 const HomePage = () => {
   return (

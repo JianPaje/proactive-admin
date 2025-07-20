@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { Link } from 'react-router-dom'; // To link to user profiles
+import { Link } from 'react-router-dom'; 
 
 const Reports = () => {
   const [reports, setReports] = useState([]);

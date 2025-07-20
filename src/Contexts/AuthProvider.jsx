@@ -1,13 +1,7 @@
-// src/contexts/AuthContext.jsx
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
-import PropTypes from 'prop-types'; // 1. Import PropTypes
+import React, { useEffect, useState, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { supabase } from '../supabaseClient';
-
-const AuthContext = createContext();
-
-export function useAuth() {
-  return useContext(AuthContext);
-}
+import { AuthContext } from './AuthContext';
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
@@ -15,31 +9,30 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
       setLoading(false);
     });
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      (_event, currentSession) => {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
         setLoading(false);
       }
     );
 
     return () => {
-      authListener.subscription.unsubscribe();
+      authListener?.subscription?.unsubscribe();
     };
   }, []);
 
-  // 2. Wrap the 'value' object in a useMemo hook.
-  // This tells React to only recreate this object when 'session' or 'user' changes.
+  // MODIFIED: Added the 'supabase' object back into the context value.
   const value = useMemo(() => ({
     session,
     user,
-    supabase,
+    supabase, // This line was added back
     login: (email, password) => supabase.auth.signInWithPassword({ email, password }),
     logout: () => supabase.auth.signOut(),
   }), [session, user]);
@@ -51,7 +44,6 @@ export function AuthProvider({ children }) {
   );
 }
 
-// 3. Add the PropTypes validation block at the bottom
 AuthProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };

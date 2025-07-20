@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "ea38700f-2a92-4e52-bc48-cb2598da9235"
+      }
+    },
+    "android": {
+      "package": "com.jh0nas.retroadmin"
+    }
+  }
+}
