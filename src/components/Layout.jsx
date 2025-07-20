@@ -1,6 +1,6 @@
 import React, { useState } from 'react'; 
 import { Outlet, Navigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import Sidebar from './sidebar';
 import Header from './Header'; 
 import { useAuth } from '../hook/useAuth';
 
