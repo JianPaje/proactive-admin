@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'; // useCallback removed
-import PropTypes from 'prop-types'; // Import PropTypes
+import React, { useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types'; 
 import { supabase } from '../supabaseClient.js'; 
 
 // Import the new Step3SelfieCapture component
@@ -7,8 +7,6 @@ import Step3SelfieCapture from '../components/Step3SelfieCapture.jsx';
 
 
 // --- Helper function to convert base64 to File ---
-// This function needs to stay here or be moved to a shared utils file
-// because uploadImage uses it, and uploadImage is within RegistrationPage.
 const dataURLtoFile = (dataurl, filename) => {
     const arr = dataurl.split(',');
     const mime = arr[0].match(/:(.*?);/)[1];
@@ -87,9 +85,9 @@ const Step1PersonalInfo = ({ formData, handleChange, onNext, errors }) => {
                 })}
             </div>
             <div className="mt-6">
-                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                <input type="text" id="address" name="address" value={formData.address} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
-                {errors?.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+                <label htmlFor="business_address" className="block text-sm font-medium text-gray-700 mb-1">Business Address</label>
+                <input type="text" id="business_address" name="business_address" value={formData.business_address} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+                {errors?.business_address && <p className="text-red-500 text-xs mt-1">{errors.business_address}</p>}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <div>
@@ -98,9 +96,18 @@ const Step1PersonalInfo = ({ formData, handleChange, onNext, errors }) => {
                     {errors?.postalCode && <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>}
                 </div>
                 <div>
-                    <label htmlFor="birthday" className="block text-sm font-medium text-gray-700 mb-1">Birthday</label>
-                    <input type="date" id="birthday" name="birthday" value={formData.birthday} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
-                     {errors?.birthday && <p className="text-red-500 text-xs mt-1">{errors.birthday}</p>}
+                    <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                    <input type="date" id="date_of_birth" name="date_of_birth" value={formData.date_of_birth} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+                     {errors?.date_of_birth && <p className="text-red-500 text-xs mt-1">{errors.date_of_birth}</p>}
+                </div>
+                <div>
+                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                    <select id="gender" name="gender" value={formData.gender} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                    {errors?.gender && <p className="text-red-500 text-xs mt-1">{errors.gender}</p>}
                 </div>
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -108,9 +115,9 @@ const Step1PersonalInfo = ({ formData, handleChange, onNext, errors }) => {
                     {errors?.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                 </div>
                 <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                    <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" maxLength="11" />
-                    {errors?.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                    <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <input type="tel" id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" maxLength="11" />
+                    {errors?.phone_number && <p className="text-red-500 text-xs mt-1">{errors.phone_number}</p>}
                 </div>
                 <div>
                     <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
@@ -204,7 +211,7 @@ Step2IDVerification.propTypes = {
     onScan: PropTypes.func.isRequired,
     onNext: PropTypes.func.isRequired,
     onBack: PropTypes.func.isRequired,
-    errors: PropTypes.object, // Added errors to propTypes
+    errors: PropTypes.object,
 };
 
 const Step4Confirmation = ({ formData, idImages, selfieImage, onConfirm, onBack, isLoading }) => {
@@ -225,11 +232,12 @@ const Step4Confirmation = ({ formData, idImages, selfieImage, onConfirm, onBack,
                         {detailItem('First Name', formData.firstName)}
                         {detailItem('Middle Name', formData.middleName)}
                         {detailItem('Last Name', formData.lastName)}
-                        {detailItem('Birthday', formData.birthday)}
+                        {detailItem('Date of Birth', formData.date_of_birth)}
+                        {detailItem('Gender', formData.gender)}
                         {detailItem('Email', formData.email)}
-                        {detailItem('Phone', formData.phone)}
+                        {detailItem('Phone Number', formData.phone_number)}
                         <div className="sm:col-span-2">
-                            {detailItem('Address', formData.address)}
+                            {detailItem('Business Address', formData.business_address)}
                         </div>
                         {detailItem('Postal Code', formData.postalCode)}
                     </div>
@@ -371,7 +379,7 @@ const uploadImage = async (image, name, userId) => {
     const filePath = `${userId}/${name}-${Date.now()}.jpg`;
     
     const { error: uploadError } = await supabase.storage
-        .from('profile')
+        .from('admin')
         .upload(filePath, file);
     
     if (uploadError) {
@@ -380,7 +388,7 @@ const uploadImage = async (image, name, userId) => {
     }
 
     const { data: urlData } = supabase.storage
-        .from('profile')
+        .from('admin')
         .getPublicUrl(filePath);
     
     return urlData.publicUrl;
@@ -388,30 +396,30 @@ const uploadImage = async (image, name, userId) => {
 
 const validatePersonalInfo = (formData) => {
     const errors = {};
-    const { firstName, lastName, address, postalCode, birthday, email, phone, password, confirmPassword } = formData;
+    const { firstName, lastName, business_address, postalCode, date_of_birth, gender, email, phone_number, password, confirmPassword } = formData;
 
-   
+    
     if (!firstName) errors.firstName = 'First name is required.';
     if (!lastName) errors.lastName = 'Last name is required.';
-    if (!address) errors.address = 'Address is required.';
+    if (!business_address) errors.business_address = 'Business address is required.';
     if (!postalCode) errors.postalCode = 'Postal Code is required.';
-    if (!birthday) errors.birthday = 'Birthday is required.';
+    if (!date_of_birth) errors.date_of_birth = 'Date of birth is required.';
+    if (!gender) errors.gender = 'Gender is required.';
     if (!email) errors.email = 'Email is required.';
-    if (!phone) errors.phone = 'Phone number is required.';
+    if (!phone_number) errors.phone_number = 'Phone number is required.';
     if (!password) errors.password = 'Password is required.';
     if (!confirmPassword) errors.confirmPassword = 'Confirm Password is required.';
 
- 
     if (postalCode && postalCode.length !== 4) {
         errors.postalCode = 'Postal code must be 4 digits.';
     }
 
-   
-    if (phone) { 
-        if (phone.length !== 11) {
-            errors.phone = 'Phone number must be 11 digits.';
-        } else if (!phone.startsWith('0')) {
-            errors.phone = 'Phone number must start with 0.';
+    
+    if (phone_number) { 
+        if (phone_number.length !== 11) {
+            errors.phone_number = 'Phone number must be 11 digits.';
+        } else if (!phone_number.startsWith('0')) {
+            errors.phone_number = 'Phone number must start with 0.';
         }
     }
     
@@ -429,14 +437,14 @@ const validatePersonalInfo = (formData) => {
             errors.password = 'Password must contain a special character.';
         }
     }
-    // Check password match only if both password fields are filled
+    // Check password match
     if (password && confirmPassword && password !== confirmPassword) {
         errors.confirmPassword = 'Passwords do not match.';
     }
 
-    // Birthday age validation
-    if (birthday) {
-        const birthDate = new Date(birthday);
+    // Age validation
+    if (date_of_birth) {
+        const birthDate = new Date(date_of_birth);
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDifference = today.getMonth() - birthDate.getMonth();
@@ -444,19 +452,14 @@ const validatePersonalInfo = (formData) => {
             age--;
         }
         if (age < 15) {
-            errors.birthday = 'You must be at least 15 years old.';
+            errors.date_of_birth = 'You must be at least 15 years old.';
         }
     }
 
-    // If any field-specific errors exist and a required field is missing,
-    // ensure a general form error is also shown if needed for UX.
-    const requiredFields = ['firstName', 'lastName', 'address', 'postalCode', 'birthday', 'email', 'phone', 'password', 'confirmPassword'];
+    const requiredFields = ['firstName', 'lastName', 'business_address', 'postalCode', 'date_of_birth', 'gender', 'email', 'phone_number', 'password', 'confirmPassword'];
     const allRequiredFilled = requiredFields.every(field => formData[field]);
-    if (!allRequiredFilled && Object.keys(errors).length === 0) { // Only add general if no specific errors yet
+    if (!allRequiredFilled && Object.keys(errors).length === 0) {
         errors.form = 'Please fill out all required fields.';
-    } else if (!allRequiredFilled && Object.keys(errors).length > 0) {
-        // If there are specific errors, just let them handle the feedback
-        // Or you could concatenate a message like 'Please correct the errors above and fill all fields.'
     }
 
 
@@ -471,8 +474,7 @@ const validateIdVerification = (formData, idImages) => {
         if (!idImages.front) errors.idFront = 'Please capture the front image of your ID.';
         if (!idImages.back) errors.idBack = 'Please capture the back image of your ID.';
     }
-    // General error if both specific ID parts are missing for non-passport
-    if (Object.keys(errors).length > 0 && !errors.id) { // If there are errors for idFront/idBack
+    if (Object.keys(errors).length > 0 && !errors.id) {
         errors.id = 'Please capture both images of your ID.';
     }
     return errors;
@@ -486,8 +488,9 @@ export default function RegistrationPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '', middleName: '', lastName: '',
-        address: '', postalCode: '', birthday: '',
-        email: '', phone: '', idType: 'National ID (Card Type)',
+        business_address: '', postalCode: '', date_of_birth: '',
+        gender: '', email: '', phone_number: '', 
+        idType: 'National ID (Card Type)',
         password: '', confirmPassword: ''
     });
     const [idImages, setIdImages] = useState({ front: null, back: null });
@@ -499,13 +502,12 @@ export default function RegistrationPage() {
         const { name, value } = e.target;
         let processedValue = value;
 
-        if (name === 'postalCode' || name === 'phone') {
+        if (name === 'postalCode' || name === 'phone_number') {
             processedValue = value.replace(/\D/g, '');
         }
 
         setFormData(prev => ({ ...prev, [name]: processedValue }));
         
-        // Clear specific error for the field being changed
         if (errors[name]) {
             setErrors(prev => {
                 const newErrors = { ...prev };
@@ -513,7 +515,6 @@ export default function RegistrationPage() {
                 return newErrors;
             });
         }
-        // Clear general form errors if fields are being filled
         if (errors.form) {
             setErrors(prev => {
                 const newErrors = { ...prev };
@@ -523,7 +524,6 @@ export default function RegistrationPage() {
         }
     };
     
-    // Refactored validateStep to use dedicated validation functions
     const validateStep = (step) => {
         let currentStepErrors = {};
         if (step === 1) {
@@ -531,58 +531,55 @@ export default function RegistrationPage() {
         } else if (step === 2) {
             currentStepErrors = validateIdVerification(formData, idImages);
         }
-        // For step 3, we're relying on the Step3SelfieCapture component's internal logic
-        // and a simple check for selfieImage existence before advancing from Step 3
         
-        setErrors(currentStepErrors); // Set the errors for the current step
-        return Object.keys(currentStepErrors).length === 0; // Return true if no errors
+        setErrors(currentStepErrors);
+        return Object.keys(currentStepErrors).length === 0;
     };
 
     const goToStep = (step) => {
-        if (step > currentStep) { // Only validate when going forward
+        if (step > currentStep) {
             if (!validateStep(currentStep)) {
-                return; // Stop if validation fails
+                return;
             }
         }
-        setErrors({}); // Clear errors when moving to a new step
+        setErrors({});
         setCurrentStep(step);
     };
 
     const handleStartScan = () => {
-        setIdImages({ front: null, back: null }); // Clear previous ID images
-        setIdCaptureStage('front'); // Start ID capture process
+        setIdImages({ front: null, back: null });
+        setIdCaptureStage('front');
     };
 
     const handleIdCapture = (image) => {
         setIdImages(prev => ({ ...prev, [idCaptureStage]: image }));
         
         if (idCaptureStage === 'front' && formData.idType !== 'Passport') {
-            setIdCaptureStage('back'); // If not passport, capture back next
+            setIdCaptureStage('back');
         } else {
-            setIdCaptureStage(null); // Finish ID capture
+            setIdCaptureStage(null);
         }
     };
     
     const handleReview = () => {
-        // Basic check for selfie image presence
         if (!selfieImage) {
-            alert("Please take a selfie first."); // Use a more sophisticated error display if possible
+            alert("Please take a selfie first.");
             return;
         }
-        goToStep(4); // Proceed to confirmation step
+        goToStep(4);
     };
 
     const handleFinalSubmit = async () => {
         setIsLoading(true);
 
         if (!supabase?.auth) {
-            alert("Supabase client is not configured correctly. Please check your API keys.");
+            alert("Supabase client is not configured correctly.");
             setIsLoading(false);
             return;
         }
 
         try {
-            // 1. Sign up user with email and password
+            // 1. Sign up user
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: formData.email,
                 password: formData.password,
@@ -591,37 +588,37 @@ export default function RegistrationPage() {
             if (authError) throw authError;
 
             const user = authData.user;
-            if (!user) throw new Error("User registration failed. No user object returned.");
+            if (!user) throw new Error("User registration failed.");
 
-            // 2. Upload images to Supabase Storage
+            // 2. Upload images
             const [selfieUrl, idFrontUrl, idBackUrl] = await Promise.all([
                 uploadImage(selfieImage, 'selfie', user.id),
                 uploadImage(idImages.front, 'id-front', user.id),
-                // Only upload id-back if it exists (for non-passport IDs)
                 formData.idType !== 'Passport' ? uploadImage(idImages.back, 'id-back', user.id) : null,
             ]);
 
-            // 3. Insert user profile data into your 'users' table
+            // 3. Insert user profile data
             const { error: profileError } = await supabase
                 .from('users')
                 .insert({
-                    id: user.id, // Link to Supabase Auth user ID
+                    id: user.id,
                     email: formData.email,
                     first_name: formData.firstName,
                     middle_name: formData.middleName,
                     last_name: formData.lastName,
-                    display_name: `${formData.firstName} ${formData.lastName}`.trim(),
-                    address: formData.address,
-                    postal_code: formData.postalCode, // Added postal code to insert
-                    birthday: formData.birthday, // Added birthday to insert
-                    phone_number: formData.phone,
-                    id_type: formData.idType, // Added id type to insert
-                    selfie_image_url: selfieUrl, // Changed to selfie_image_url for consistency
+                    fullName: `${formData.firstName} ${formData.middleName || ''} ${formData.lastName}`.replace(/\s+/g, ' ').trim(),
+                    business_address: formData.business_address,
+                    postal_code: formData.postalCode,
+                    date_of_birth: formData.date_of_birth,
+                    gender: formData.gender,
+                    phone_number: formData.phone_number,
+                    id_type: formData.idType,
+                    selfie_image_url: selfieUrl,
                     id_front_url: idFrontUrl,
                     id_back_url: idBackUrl,
-                    status: 'pending_approval', // Initial status
-                    role: 'user', // Default role
-                    created_at: new Date().toISOString(), // Add a timestamp
+                    status: 'pending_approval',
+                    role: 'user',
+                    created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
                 });
 
@@ -630,7 +627,7 @@ export default function RegistrationPage() {
                 throw profileError;
             }
 
-            setCurrentStep(5); // Advance to the submission success message
+            setCurrentStep(5);
 
         } catch (error) {
             console.error("Registration Error:", error);
@@ -645,10 +642,8 @@ export default function RegistrationPage() {
             case 1:
                 return <Step1PersonalInfo formData={formData} handleChange={handleChange} onNext={() => goToStep(2)} errors={errors} />;
             case 2:
-                // Pass errors to Step2IDVerification as well
                 return <Step2IDVerification idType={formData.idType} handleChange={handleChange} idImages={idImages} onScan={handleStartScan} onNext={() => goToStep(3)} onBack={() => goToStep(1)} errors={errors} />;
             case 3:
-                // Use the imported Step3SelfieCapture component
                 return <Step3SelfieCapture selfieImage={selfieImage} setSelfieImage={setSelfieImage} onSubmit={handleReview} onBack={() => goToStep(2)} />;
             case 4:
                 return <Step4Confirmation formData={formData} idImages={idImages} selfieImage={selfieImage} onConfirm={handleFinalSubmit} onBack={() => goToStep(3)} isLoading={isLoading} />;
@@ -661,7 +656,6 @@ export default function RegistrationPage() {
 
     return (
         <div className="bg-gray-100 flex items-center justify-center min-h-screen p-4 font-sans">
-            {/* The main container for steps other than the full-screen selfie capture */}
             {currentStep !== 3 && (
                 <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-10 relative">
                     {currentStep < 5 && (
@@ -683,10 +677,8 @@ export default function RegistrationPage() {
                     {renderStep()}
                 </div>
             )}
-            {/* Render the full-screen selfie capture directly when currentStep is 3 */}
             {currentStep === 3 && renderStep()}
             
-            {/* CameraModal for ID capture */}
             <CameraModal 
                 captureStage={idCaptureStage} 
                 onClose={() => setIdCaptureStage(null)} 
