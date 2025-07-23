@@ -29,7 +29,7 @@ const HomePage = () => {
               all from the palm of your hand.
             </p>
             <div className="flex justify-center md:justify-start space-x-4">
-              <a href="#download-google-play" className="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
+              <a href="https://expo.dev/artifacts/eas/3aBdiHwAQuKdXon8q6Y7iZ.apk" className="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
                 Download for Android
               </a>
               {/* --- THIS IS THE MODIFIED BUTTON --- */}
