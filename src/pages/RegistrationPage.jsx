@@ -72,6 +72,8 @@ const Step1PersonalInfo = ({ formData, handleChange, onNext, errors }) => {
     return (
         <div>
             <h2 className="text-2xl font-semibold text-gray-700 mb-6">Personal Information</h2>
+            
+            {/* Name Fields */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {['firstName', 'middleName', 'lastName'].map(field => {
                     const label = field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
@@ -84,21 +86,34 @@ const Step1PersonalInfo = ({ formData, handleChange, onNext, errors }) => {
                     );
                 })}
             </div>
-            <div className="mt-6">
-                <label htmlFor="business_address" className="block text-sm font-medium text-gray-700 mb-1">Business Address</label>
-                <input type="text" id="business_address" name="business_address" value={formData.business_address} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
-                {errors?.business_address && <p className="text-red-500 text-xs mt-1">{errors.business_address}</p>}
-            </div>
+
+            {/* Username and DOB Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div>
-                    <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
-                    <input type="text" id="postalCode" name="postalCode" value={formData.postalCode} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" maxLength="4" />
-                    {errors?.postalCode && <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>}
+                 <div>
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input type="text" id="username" name="username" value={formData.username} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+                    {errors?.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
                 </div>
                 <div>
                     <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
                     <input type="date" id="date_of_birth" name="date_of_birth" value={formData.date_of_birth} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
                      {errors?.date_of_birth && <p className="text-red-500 text-xs mt-1">{errors.date_of_birth}</p>}
+                </div>
+            </div>
+
+            {/* Address Field */}
+            <div className="mt-6">
+                <label htmlFor="business_address" className="block text-sm font-medium text-gray-700 mb-1">Business Address</label>
+                <input type="text" id="business_address" name="business_address" value={formData.business_address} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+                {errors?.business_address && <p className="text-red-500 text-xs mt-1">{errors.business_address}</p>}
+            </div>
+
+            {/* Other Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div>
+                    <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+                    <input type="text" id="postalCode" name="postalCode" value={formData.postalCode} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" maxLength="4" />
+                    {errors?.postalCode && <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>}
                 </div>
                 <div>
                     <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
@@ -130,6 +145,7 @@ const Step1PersonalInfo = ({ formData, handleChange, onNext, errors }) => {
                     {errors?.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                 </div>
             </div>
+
             {errors?.form && <p className="text-red-500 text-sm mt-4 text-center">{errors.form}</p>}
             <div className="mt-8 text-right">
                 <button onClick={onNext} className="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">Next</button>
@@ -193,7 +209,7 @@ const Step2IDVerification = ({ idType, handleChange, idImages, onScan, onNext, o
             {errors?.id && <p className="text-red-500 text-sm mt-4 text-center">{errors.id}</p>}
             <div className="mt-6 text-center">
                    <button onClick={onScan} className="w-full md:w-1/2 px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-sm hover:bg-indigo-600 transition">
-                     {isPassport ? 'Scan Passport' : 'Scan ID'}
+                      {isPassport ? 'Scan Passport' : 'Scan ID'}
                    </button>
              </div>
             <div className="mt-8 flex flex-col sm:flex-row justify-between gap-4">
@@ -232,14 +248,15 @@ const Step4Confirmation = ({ formData, idImages, selfieImage, onConfirm, onBack,
                         {detailItem('First Name', formData.firstName)}
                         {detailItem('Middle Name', formData.middleName)}
                         {detailItem('Last Name', formData.lastName)}
+                        {detailItem('Username', formData.username)}
                         {detailItem('Date of Birth', formData.date_of_birth)}
                         {detailItem('Gender', formData.gender)}
-                        {detailItem('Email', formData.email)}
-                        {detailItem('Phone Number', formData.phone_number)}
-                        <div className="sm:col-span-2">
+                        <div className="sm:col-span-2 md:col-span-3">
                             {detailItem('Business Address', formData.business_address)}
                         </div>
                         {detailItem('Postal Code', formData.postalCode)}
+                        {detailItem('Email', formData.email)}
+                        {detailItem('Phone Number', formData.phone_number)}
                     </div>
                 </div>
 
@@ -396,14 +413,19 @@ const uploadImage = async (image, name, userId) => {
 
 const validatePersonalInfo = (formData) => {
     const errors = {};
-    const { firstName, lastName, business_address, postalCode, date_of_birth, gender, email, phone_number, password, confirmPassword } = formData;
+    const { firstName, lastName, username, business_address, postalCode, date_of_birth, gender, email, phone_number, password, confirmPassword } = formData;
 
     
     if (!firstName) errors.firstName = 'First name is required.';
     if (!lastName) errors.lastName = 'Last name is required.';
+    if (!username) {
+        errors.username = 'Username is required.';
+    } else if (username.length < 3) {
+        errors.username = 'Username must be at least 3 characters.';
+    }
+    if (!date_of_birth) errors.date_of_birth = 'Date of birth is required.';
     if (!business_address) errors.business_address = 'Business address is required.';
     if (!postalCode) errors.postalCode = 'Postal Code is required.';
-    if (!date_of_birth) errors.date_of_birth = 'Date of birth is required.';
     if (!gender) errors.gender = 'Gender is required.';
     if (!email) errors.email = 'Email is required.';
     if (!phone_number) errors.phone_number = 'Phone number is required.';
@@ -456,7 +478,7 @@ const validatePersonalInfo = (formData) => {
         }
     }
 
-    const requiredFields = ['firstName', 'lastName', 'business_address', 'postalCode', 'date_of_birth', 'gender', 'email', 'phone_number', 'password', 'confirmPassword'];
+    const requiredFields = ['firstName', 'lastName', 'username', 'date_of_birth', 'business_address', 'postalCode', 'gender', 'email', 'phone_number', 'password', 'confirmPassword'];
     const allRequiredFilled = requiredFields.every(field => formData[field]);
     if (!allRequiredFilled && Object.keys(errors).length === 0) {
         errors.form = 'Please fill out all required fields.';
@@ -488,6 +510,7 @@ export default function RegistrationPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '', middleName: '', lastName: '',
+        username: '',
         business_address: '', postalCode: '', date_of_birth: '',
         gender: '', email: '', phone_number: '', 
         idType: 'National ID (Card Type)',
@@ -504,6 +527,10 @@ export default function RegistrationPage() {
 
         if (name === 'postalCode' || name === 'phone_number') {
             processedValue = value.replace(/\D/g, '');
+        }
+        
+        if (name === 'username') {
+            processedValue = value.replace(/\s/g, ''); // Prevent spaces in username
         }
 
         setFormData(prev => ({ ...prev, [name]: processedValue }));
@@ -603,6 +630,7 @@ export default function RegistrationPage() {
                 .insert({
                     id: user.id,
                     email: formData.email,
+                    username: formData.username,
                     first_name: formData.firstName,
                     middle_name: formData.middleName,
                     last_name: formData.lastName,
