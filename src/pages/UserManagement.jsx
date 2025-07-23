@@ -44,7 +44,7 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  // MODIFIED: This function now also updates the selectedUser state
+  
   const handleUpdateStatus = async (userId, newStatus) => {
     if (!window.confirm(`Are you sure you want to set this user's status to "${newStatus}"?`)) {
       return;
@@ -61,8 +61,7 @@ const UserManagement = () => {
       );
       setUsers(updatedUsers);
 
-      // If the updated user is the one currently selected in the modal,
-      // update the selectedUser state as well to refresh the modal.
+    
       if (selectedUser && selectedUser.id === userId) {
         setSelectedUser(prevUser => ({ ...prevUser, status: newStatus }));
       }
@@ -86,13 +85,12 @@ const UserManagement = () => {
   
   const handleFullVerification = (userId) => {
     handleUpdateStatus(userId, 'fully_verified');
-    // We don't need to close the modal anymore, it will update automatically
-    // handleCloseModal(); 
+  
   };
 
   const filteredUsers = users.filter(user =>
     (user.email?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (user.display_name?.toLowerCase().includes(searchTerm.toLowerCase()))
+    (user.username?.toLowerCase().includes(searchTerm.toLowerCase())) // Changed from display_name
   );
 
   if (loading) return <div>Loading users...</div>;
@@ -104,7 +102,7 @@ const UserManagement = () => {
         <h1 className="text-2xl font-bold">User Management</h1>
         <input
           type="text"
-          placeholder="Search by email or name..."
+          placeholder="Search by email or username..." // Updated placeholder text
           className="px-4 py-2 border rounded-md"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -125,7 +123,7 @@ const UserManagement = () => {
             {filteredUsers.length > 0 ? filteredUsers.map(user => (
               <tr key={user.id} className="hover:bg-gray-50">
                 <td className="px-5 py-4 border-b text-sm">{user.email}</td>
-                <td className="px-5 py-4 border-b text-sm">{user.display_name || 'N/A'}</td>
+                <td className="px-5 py-4 border-b text-sm">{user.username || 'N/A'}</td> {/* Changed from display_name */}
                 <td className="px-5 py-4 border-b text-sm">{user.created_at ? new Date(user.created_at).toLocaleString() : 'N/A'}</td>
                 <td className="px-5 py-4 border-b text-sm">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(user.status)}`}>

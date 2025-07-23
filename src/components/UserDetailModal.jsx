@@ -18,18 +18,34 @@ const UserDetailModal = ({ user, onClose, onVerify }) => {
       return dateString;
     }
   };
+  
+  // --- ADDED: Function to format timestamp ---
+  const formatTimestamp = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    } catch (e) {
+      console.error("Error formatting timestamp:", e);
+      return dateString;
+    }
+  };
+  // ------------------------------------------
 
-  // --- START FIX FOR NESTED TERNARY ---
-  // Extract the logic for the alt text into a variable
   const idImageAltText = (() => {
     if (user.id_type === 'Passport') {
       return isIdFlipped ? 'Passport Image (flipped)' : 'Passport Image (front)';
     } else {
-      // For non-passport IDs, determine alt text based on flip state
       return isIdFlipped ? 'Verified ID Back' : 'Verified ID Front';
     }
   })();
-  // --- END FIX FOR NESTED TERNARY ---
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -57,8 +73,7 @@ const UserDetailModal = ({ user, onClose, onVerify }) => {
                 aria-label="Flip ID card to see other side"
               >
                 <span className="sr-only">
-                    {/* Use the extracted variable here */}
-                    {idImageAltText} 
+                  {idImageAltText} 
                 </span>
                 {isIdFlipped ? (
                   <img src={user.id_back_url || 'https://placehold.co/400x250?text=ID+Back'} alt="Verified ID Back" className="w-full h-auto" />
@@ -76,7 +91,11 @@ const UserDetailModal = ({ user, onClose, onVerify }) => {
           <div className="md:col-span-2 space-y-4">
             <div>
               <span className="text-sm font-bold text-gray-600">Full Name</span>
-              <p className="text-lg">{user.display_name || 'N/A'}</p>
+              <p className="text-lg">{user.fullName || 'N/A'}</p>
+            </div>
+            <div>
+              <span className="text-sm font-bold text-gray-600">Username</span>
+              <p className="text-lg">{user.username || 'N/A'}</p>
             </div>
             <div>
               <span className="text-sm font-bold text-gray-600">Email Address</span>
@@ -98,6 +117,12 @@ const UserDetailModal = ({ user, onClose, onVerify }) => {
               <span className="text-sm font-bold text-gray-600">Postal Code</span>
               <p className="text-lg">{user.postal_code || 'N/A'}</p>
             </div>
+             {/* --- ADDED: Section to display registration date --- */}
+            <div>
+              <span className="text-sm font-bold text-gray-600">Registered On</span>
+              <p className="text-lg">{formatTimestamp(user.registered_on)}</p>
+            </div>
+            {/* -------------------------------------------------- */}
             <div>
               <span className="text-sm font-bold text-gray-600">Current Status</span>
               <p className="text-lg capitalize">
@@ -134,7 +159,8 @@ UserDetailModal.propTypes = {
     selfie_image_url: PropTypes.string,
     id_front_url: PropTypes.string,
     id_back_url: PropTypes.string,
-    display_name: PropTypes.string,
+    fullName: PropTypes.string,
+    username: PropTypes.string,
     email: PropTypes.string,
     phone_number: PropTypes.string,
     address: PropTypes.string,
@@ -142,6 +168,7 @@ UserDetailModal.propTypes = {
     id_type: PropTypes.string,
     birthday: PropTypes.string,
     postal_code: PropTypes.string,
+    registered_on: PropTypes.string, // --- ADDED ---
   }).isRequired,
   onClose: PropTypes.func.isRequired,
   onVerify: PropTypes.func.isRequired,
