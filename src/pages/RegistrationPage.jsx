@@ -149,7 +149,7 @@ const Step2IDVerification = ({ idType, handleChange, idImages, onScan, onNext, o
     const idOptions = [
         'National ID (Card Type)', 'National ID (Paper Type) / Digital National ID', 'Passport',
         'HDMF (Pag-Ibig Loyalty Plus)', "Driver's License", 'Philippine Postal ID',
-        'PRC ID', 'UMID', 'SSS ID'
+        'PRC ID', 'UMID', 'SSS ID' , 'School ID'
     ];
     
     const isPassport = idType === 'Passport';
