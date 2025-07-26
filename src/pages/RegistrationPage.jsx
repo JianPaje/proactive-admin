@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types'; 
-// NOTE: useNavigate is removed as we are not navigating within the web app on success
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient.js'; 
 
 import Step3SelfieCapture from '../components/Step3SelfieCapture.jsx'; 
@@ -365,18 +365,16 @@ CameraModal.propTypes = {
     onCapture: PropTypes.func.isRequired,
 };
 
-const Step5VerificationResult = ({ result, onRetry }) => {
-    // UPDATED: Automatically redirect on success to the mobile app
+const Step5VerificationResult = ({ result, onRetry, onSuccessRedirect }) => {
     useEffect(() => {
         if (result?.match) {
             const timer = setTimeout(() => {
-                // This is a deep link that should open your React Native app
-                window.location.href = 'retroapp://login'; 
-            }, 3000); // 3-second delay
+                onSuccessRedirect();
+            }, 3000); 
 
             return () => clearTimeout(timer);
         }
-    }, [result]);
+    }, [result, onSuccessRedirect]);
 
     if (!result) {
         return (
@@ -394,9 +392,8 @@ const Step5VerificationResult = ({ result, onRetry }) => {
                     <svg className="w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-800">Registration Submitted!</h2>
-                <p className="text-gray-600 mt-2">Thank you. Your information has been submitted for final review.</p>
-                <p className="text-gray-600 mt-4 font-semibold">Attempting to open your mobile app to sign in...</p>
-                <p className="text-gray-500 mt-2 text-sm">If the app does not open automatically, please open it manually and sign in.</p>
+                <p className="text-gray-600 mt-2">Thank you. Your account has been successfully verified.</p>
+                <p className="text-gray-600 mt-4 font-semibold">Redirecting you to the sign-in page...</p>
             </div>
         );
     } else {
@@ -418,6 +415,7 @@ const Step5VerificationResult = ({ result, onRetry }) => {
 Step5VerificationResult.propTypes = {
     result: PropTypes.object,
     onRetry: PropTypes.func.isRequired,
+    onSuccessRedirect: PropTypes.func.isRequired,
 };
 
 
@@ -525,6 +523,7 @@ export default function RegistrationPage() {
     const [idCaptureStage, setIdCaptureStage] = useState(null);
     const [errors, setErrors] = useState({});
     const [verificationResult, setVerificationResult] = useState(null);
+    const navigate = useNavigate();
     const idScanTimer = useRef(null);
 
     const handleRetryVerification = () => {
@@ -666,7 +665,8 @@ export default function RegistrationPage() {
                         selfie_image_url: selfieUrl,
                         id_front_url: idFrontUrl,
                         id_back_url: idBackUrl,
-                        status: 'Approved',
+                        // UPDATED: Set status to 'verified' on successful registration
+                        status: 'verified', 
                         role: 'user',
                         is_face_verified: true,
                         face_match_score: verificationData.similarity,
@@ -700,7 +700,7 @@ export default function RegistrationPage() {
             case 4:
                 return <Step4Confirmation formData={formData} idImages={idImages} selfieImage={selfieImage} onConfirm={handleFinalSubmit} onBack={() => goToStep(3)} isLoading={isLoading} />;
             case 5:
-                return <Step5VerificationResult result={verificationResult} onRetry={handleRetryVerification} onSuccessRedirect={() => { /* Handled by useEffect in Step5 */ }} />;
+                return <Step5VerificationResult result={verificationResult} onRetry={handleRetryVerification} onSuccessRedirect={() => navigate('/login')} />;
             default:
                 return null;
         }

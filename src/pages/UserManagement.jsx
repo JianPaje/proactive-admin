@@ -6,13 +6,11 @@ import UserDetailModal from '../components/UserDetailModal.jsx';
 // Helper to get styling for different user statuses
 const getStatusClasses = (status) => {
   switch (status) {
-    // UPDATED: Changed 'approved' to 'verified' to match your RLS policy
     case 'verified':
     case 'full verified': 
       return 'bg-green-100 text-green-800';
-    case 'pending_approval':
-      return 'bg-yellow-100 text-yellow-800';
-    case 'suspend': 
+    // REMOVED: pending_approval case is no longer needed
+    case 'suspended': 
       return 'bg-purple-100 text-purple-800';
     default:
       return 'bg-red-100 text-red-800';
@@ -52,7 +50,7 @@ const UserManagement = () => {
     }
     
     try {
-      if (newStatus === 'suspend') {
+      if (newStatus === 'suspended') {
         const { error: functionError } = await supabase.functions.invoke('suspend-user', {
           body: { userIdToSuspend: userId },
         });
@@ -100,6 +98,28 @@ const UserManagement = () => {
     (user.email?.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (user.username?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+  
+  // Component for rendering action buttons based on user status
+  const ActionButtons = ({ user }) => {
+    switch (user.status) {
+      // REMOVED: pending_approval case is no longer needed
+      case 'suspended':
+        return (
+          <button type="button" onClick={() => handleUpdateStatus(user.id, 'fully_verified')} className="text-green-600 hover:underline">
+            Reactivate
+          </button>
+        );
+      case 'verified':
+      case 'full verified':
+        return (
+          <button type="button" onClick={() => handleUpdateStatus(user.id, 'suspended')} className="text-red-600 hover:underline">
+            Suspend
+          </button>
+        );
+      default:
+        return null; // Or show a default state if needed
+    }
+  };
 
   if (loading) return <div>Loading users...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
@@ -152,17 +172,7 @@ const UserManagement = () => {
                         <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                       </svg>
                     </button>
-                    {/* UPDATED: Check for 'suspend' status */}
-                    {user.status === 'suspend' ? (
-                      // UPDATED: Set status to 'verified' on reactivate
-                      <button type="button" onClick={() => handleUpdateStatus(user.id, 'verified')} className="text-green-600 hover:underline">
-                        Reactivate
-                      </button>
-                    ) : (
-                      <button type="button" onClick={() => handleUpdateStatus(user.id, 'suspend')} className="text-red-600 hover:underline">
-                        Suspend
-                      </button>
-                    )}
+                    <ActionButtons user={user} />
                   </div>
                 </td>
               </tr>
