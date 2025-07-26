@@ -7,9 +7,8 @@ import UserDetailModal from '../components/UserDetailModal.jsx';
 const getStatusClasses = (status) => {
   switch (status) {
     case 'verified':
-    case 'full verified': 
+    case 'fully_verified': // CORRECTED: from 'full verified'
       return 'bg-green-100 text-green-800';
-    // REMOVED: pending_approval case is no longer needed
     case 'suspended': 
       return 'bg-purple-100 text-purple-800';
     default:
@@ -91,7 +90,7 @@ const UserManagement = () => {
   };
   
   const handleFullVerification = (userId) => {
-    handleUpdateStatus(userId, 'full verified');
+    handleUpdateStatus(userId, 'fully_verified'); // CORRECTED: from 'full verified'
   };
 
   const filteredUsers = users.filter(user =>
@@ -102,7 +101,6 @@ const UserManagement = () => {
   // Component for rendering action buttons based on user status
   const ActionButtons = ({ user }) => {
     switch (user.status) {
-      // REMOVED: pending_approval case is no longer needed
       case 'suspended':
         return (
           <button type="button" onClick={() => handleUpdateStatus(user.id, 'fully_verified')} className="text-green-600 hover:underline">
@@ -110,14 +108,14 @@ const UserManagement = () => {
           </button>
         );
       case 'verified':
-      case 'full verified':
+      case 'fully_verified': // CORRECTED: from 'full verified'
         return (
           <button type="button" onClick={() => handleUpdateStatus(user.id, 'suspended')} className="text-red-600 hover:underline">
             Suspend
           </button>
         );
       default:
-        return null; // Or show a default state if needed
+        return null;
     }
   };
 
