@@ -90,7 +90,7 @@ const UserManagement = () => {
 
   const filteredUsers = users.filter(user =>
     (user.email?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (user.username?.toLowerCase().includes(searchTerm.toLowerCase())) // Changed from display_name
+    (user.username?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   if (loading) return <div>Loading users...</div>;
@@ -102,7 +102,7 @@ const UserManagement = () => {
         <h1 className="text-2xl font-bold">User Management</h1>
         <input
           type="text"
-          placeholder="Search by email or username..." // Updated placeholder text
+          placeholder="Search by email or username..."
           className="px-4 py-2 border rounded-md"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -116,6 +116,7 @@ const UserManagement = () => {
               <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Display Name</th>
               <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Registered On</th>
               <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Status</th>
+              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Face Verified</th>
               <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Actions</th>
             </tr>
           </thead>
@@ -123,11 +124,16 @@ const UserManagement = () => {
             {filteredUsers.length > 0 ? filteredUsers.map(user => (
               <tr key={user.id} className="hover:bg-gray-50">
                 <td className="px-5 py-4 border-b text-sm">{user.email}</td>
-                <td className="px-5 py-4 border-b text-sm">{user.username || 'N/A'}</td> {/* Changed from display_name */}
+                <td className="px-5 py-4 border-b text-sm">{user.username || 'N/A'}</td>
                 <td className="px-5 py-4 border-b text-sm">{user.created_at ? new Date(user.created_at).toLocaleString() : 'N/A'}</td>
                 <td className="px-5 py-4 border-b text-sm">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(user.status)}`}>
                     {user.status ? user.status.replace(/_/g, ' ') : 'N/A'}
+                  </span>
+                </td>
+                <td className="px-5 py-4 border-b text-sm">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.is_face_verified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    {user.is_face_verified ? 'Yes' : 'No'}
                   </span>
                 </td>
                 <td className="px-5 py-4 border-b text-sm">
@@ -152,7 +158,7 @@ const UserManagement = () => {
               </tr>
             )) : (
               <tr>
-                <td colSpan="5" className="text-center py-4">No users found.</td>
+                <td colSpan="6" className="text-center py-4">No users found.</td>
               </tr>
             )}
           </tbody>

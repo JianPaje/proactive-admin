@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types'; // --- ADDED: Import PropTypes
-import { supabase } from '../supabaseClient';
+import { supabase } from '../supabaseClient.js';
 import { Link } from 'react-router-dom'; 
 
 // Modal to view report details and screenshots
@@ -265,8 +265,8 @@ const Reports = () => {
                                                     <option value="action_taken">Action Taken</option>
                                                     <option value="dismissed">Dismissed</option>
                                                 </select>
-                                                <button onClick={() => setWarningReport(report)} className="px-3 py-1 bg-blue-500 text-white rounded-md text-xs font-bold">
-                                                    EMAIL
+                                                <button onClick={() => setWarningReport(report)} className="px-3 py-1 bg-red-500 text-white rounded-md text-xs font-bold">
+                                                    WARN
                                                 </button>
                                             </>
                                         ) : (

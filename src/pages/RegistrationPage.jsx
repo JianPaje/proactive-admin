@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types'; 
+// NOTE: useNavigate is removed as we are not navigating within the web app on success
 import { supabase } from '../supabaseClient.js'; 
 
-// Import the new Step3SelfieCapture component
 import Step3SelfieCapture from '../components/Step3SelfieCapture.jsx'; 
 
 
@@ -73,7 +73,6 @@ const Step1PersonalInfo = ({ formData, handleChange, onNext, errors }) => {
         <div>
             <h2 className="text-2xl font-semibold text-gray-700 mb-6">Personal Information</h2>
             
-            {/* Name Fields */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {['firstName', 'middleName', 'lastName'].map(field => {
                     const label = field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
@@ -87,9 +86,8 @@ const Step1PersonalInfo = ({ formData, handleChange, onNext, errors }) => {
                 })}
             </div>
 
-            {/* Username and DOB Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                 <div>
+                <div>
                     <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">Username</label>
                     <input type="text" id="username" name="username" value={formData.username} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
                     {errors?.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
@@ -97,18 +95,16 @@ const Step1PersonalInfo = ({ formData, handleChange, onNext, errors }) => {
                 <div>
                     <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
                     <input type="date" id="date_of_birth" name="date_of_birth" value={formData.date_of_birth} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
-                     {errors?.date_of_birth && <p className="text-red-500 text-xs mt-1">{errors.date_of_birth}</p>}
+                    {errors?.date_of_birth && <p className="text-red-500 text-xs mt-1">{errors.date_of_birth}</p>}
                 </div>
             </div>
 
-            {/* Address Field */}
             <div className="mt-6">
                 <label htmlFor="business_address" className="block text-sm font-medium text-gray-700 mb-1">Business Address</label>
                 <input type="text" id="business_address" name="business_address" value={formData.business_address} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
                 {errors?.business_address && <p className="text-red-500 text-xs mt-1">{errors.business_address}</p>}
             </div>
 
-            {/* Other Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <div>
                     <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
@@ -148,7 +144,7 @@ const Step1PersonalInfo = ({ formData, handleChange, onNext, errors }) => {
 
             {errors?.form && <p className="text-red-500 text-sm mt-4 text-center">{errors.form}</p>}
             <div className="mt-8 text-right">
-                <button onClick={onNext} className="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">Next</button>
+                <button type="button" onClick={onNext} className="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">Next</button>
             </div>
         </div>
     );
@@ -170,6 +166,12 @@ const Step2IDVerification = ({ idType, handleChange, idImages, onScan, onNext, o
     
     const isPassport = idType === 'Passport';
 
+    const getScanButtonText = () => {
+        if (isPassport) return 'Scan Passport';
+        if (idImages.front && idImages.back) return 'Rescan ID';
+        return 'Scan ID';
+    };
+
     return (
         <div>
             <h2 className="text-2xl font-semibold text-gray-700 mb-6">ID Verification</h2>
@@ -179,15 +181,11 @@ const Step2IDVerification = ({ idType, handleChange, idImages, onScan, onNext, o
                     {idOptions.map(opt => <option key={opt}>{opt}</option>)}
                 </select>
             </div>
-            <div className={`grid grid-cols-1 ${isPassport ? 'justify-items-center' : 'md:grid-cols-2'} gap-8 mt-6`}>
+            <div className={`grid grid-cols-1 ${isPassport ? '' : 'md:grid-cols-2'} gap-8 mt-6 justify-items-center`}>
                 <div className="text-center w-full max-w-sm">
                     <h3 className="font-semibold text-gray-600 mb-2 capitalize">{isPassport ? 'Passport Photo Page' : 'Front of ID'}</h3>
                     <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
-                        {idImages.front ? (
-                            <img src={idImages.front} alt="Front of ID" className="w-full h-full object-cover" />
-                        ) : (
-                            <span className="text-gray-500">Preview</span>
-                        )}
+                        {idImages.front ? <img src={idImages.front} alt="Front of ID" className="w-full h-full object-cover" /> : <span className="text-gray-500">Preview</span>}
                     </div>
                     {errors?.idFront && <p className="text-red-500 text-xs mt-1">{errors.idFront}</p>}
                 </div>
@@ -196,25 +194,23 @@ const Step2IDVerification = ({ idType, handleChange, idImages, onScan, onNext, o
                     <div className="text-center w-full max-w-sm">
                         <h3 className="font-semibold text-gray-600 mb-2 capitalize">Back of ID</h3>
                         <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
-                            {idImages.back ? (
-                                <img src={idImages.back} alt="Back of ID" className="w-full h-full object-cover" />
-                            ) : (
-                                <span className="text-gray-500">Preview</span>
-                            )}
+                            {idImages.back ? <img src={idImages.back} alt="Back of ID" className="w-full h-full object-cover" /> : <span className="text-gray-500">Preview</span>}
                         </div>
                         {errors?.idBack && <p className="text-red-500 text-xs mt-1">{errors.idBack}</p>}
                     </div>
                 )}
             </div>
-            {errors?.id && <p className="text-red-500 text-sm mt-4 text-center">{errors.id}</p>}
+            
             <div className="mt-6 text-center">
-                   <button onClick={onScan} className="w-full md:w-1/2 px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-sm hover:bg-indigo-600 transition">
-                      {isPassport ? 'Scan Passport' : 'Scan ID'}
-                   </button>
-             </div>
+                <button type="button" onClick={onScan} className="w-full md:w-1/2 px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-sm hover:bg-indigo-600 transition">
+                    {getScanButtonText()}
+                </button>
+            </div>
+
+            {errors?.id && <p className="text-red-500 text-sm mt-4 text-center">{errors.id}</p>}
             <div className="mt-8 flex flex-col sm:flex-row justify-between gap-4">
-                <button onClick={onBack} className="w-full sm:w-auto px-8 py-3 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition">Back</button>
-                <button onClick={onNext} className="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">Next</button>
+                <button type="button" onClick={onBack} className="w-full sm:w-auto px-8 py-3 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition">Back</button>
+                <button type="button" onClick={onNext} className="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">Next</button>
             </div>
         </div>
     );
@@ -232,9 +228,9 @@ Step2IDVerification.propTypes = {
 
 const Step4Confirmation = ({ formData, idImages, selfieImage, onConfirm, onBack, isLoading }) => {
     const detailItem = (label, value) => (
-        <div>
+        <div className="py-2">
             <p className="text-sm text-gray-500">{label}</p>
-            <p className="text-lg font-medium text-gray-800">{value || 'N/A'}</p>
+            <p className="text-lg font-medium text-gray-800 break-words">{value || 'N/A'}</p>
         </div>
     );
 
@@ -244,7 +240,7 @@ const Step4Confirmation = ({ formData, idImages, selfieImage, onConfirm, onBack,
             <div className="space-y-6">
                 <div className="p-4 border rounded-lg">
                     <h3 className="text-xl font-semibold text-gray-800 mb-4">Personal Information</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6">
                         {detailItem('First Name', formData.firstName)}
                         {detailItem('Middle Name', formData.middleName)}
                         {detailItem('Last Name', formData.lastName)}
@@ -261,32 +257,32 @@ const Step4Confirmation = ({ formData, idImages, selfieImage, onConfirm, onBack,
                 </div>
 
                 <div className="p-4 border rounded-lg">
-                     <h3 className="text-xl font-semibold text-gray-800 mb-4">Verification Images</h3>
-                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-                         <div className="text-center">
-                             <h4 className="font-semibold text-gray-600 mb-2">Selfie</h4>
-                             <img src={selfieImage} alt="Selfie" className="w-full max-w-xs mx-auto h-auto rounded-lg shadow-md" />
-                         </div>
-                         <div className="text-center">
-                             <h4 className="font-semibold text-gray-600 mb-2">{formData.idType === 'Passport' ? 'Passport' : 'ID Front'}</h4>
-                             <img src={idImages.front} alt="ID Front" className="w-full max-w-xs mx-auto h-auto rounded-lg shadow-md" />
-                         </div>
-                         {idImages.back && (
-                             <div className="text-center">
-                                 <h4 className="font-semibold text-gray-600 mb-2">ID Back</h4>
-                                 <img src={idImages.back} alt="ID Back" className="w-full h-full object-cover" />
-                             </div>
-                         )}
-                     </div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4">Verification Images</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                        <div className="text-center">
+                            <h4 className="font-semibold text-gray-600 mb-2">Selfie</h4>
+                            <img src={selfieImage} alt="Selfie" className="w-full max-w-xs mx-auto h-auto rounded-lg shadow-md" />
+                        </div>
+                        <div className="text-center">
+                            <h4 className="font-semibold text-gray-600 mb-2">{formData.idType === 'Passport' ? 'Passport' : 'ID Front'}</h4>
+                            <img src={idImages.front} alt="ID Front" className="w-full max-w-xs mx-auto h-auto rounded-lg shadow-md" />
+                        </div>
+                        {idImages.back && (
+                            <div className="text-center">
+                                <h4 className="font-semibold text-gray-600 mb-2">ID Back</h4>
+                                <img src={idImages.back} alt="ID Back" className="w-full h-full object-cover" />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
-             <div className="mt-8 flex flex-col sm:flex-row justify-between gap-4">
-                <button onClick={onBack} className="w-full sm:w-auto px-8 py-3 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition" disabled={isLoading}>Back to Edit</button>
-                <button onClick={onConfirm} className="w-full sm:w-auto px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition disabled:bg-gray-400" disabled={isLoading}>
+            <div className="mt-8 flex flex-col sm:flex-row justify-between gap-4">
+                <button type="button" onClick={onBack} className="w-full sm:w-auto px-8 py-3 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition" disabled={isLoading}>Back to Edit</button>
+                <button type="button" onClick={onConfirm} className="w-full sm:w-auto px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition disabled:bg-gray-400" disabled={isLoading}>
                     {isLoading ? 'Submitting...' : 'Confirm & Submit'}
                 </button>
-             </div>
+            </div>
         </div>
     );
 };
@@ -311,9 +307,7 @@ const CameraModal = ({ captureStage, onClose, onCapture }) => {
             const startCamera = async () => {
                 try {
                     streamRef.current = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                    if (videoRef.current) {
-                        videoRef.current.srcObject = streamRef.current;
-                    }
+                    if (videoRef.current) videoRef.current.srcObject = streamRef.current;
                 } catch (err) {
                     console.error("Error accessing camera:", err);
                     onClose();
@@ -344,29 +338,21 @@ const CameraModal = ({ captureStage, onClose, onCapture }) => {
     return (
         <div className="fixed inset-0 bg-gray-800 z-50 flex flex-col text-white">
             <header className="bg-gray-900 p-4 flex items-center">
-                <button onClick={onClose} className="text-2xl">&times;</button>
+                <button type="button" onClick={onClose} className="text-2xl">&times;</button>
                 <h2 className="text-xl font-semibold mx-auto">Take photo</h2>
             </header>
 
             <main className="flex-grow flex flex-col items-center justify-center p-4 relative">
-                <p className="absolute top-4 text-lg">
-                    {captureStage === 'front' ? 'Front of ID' : 'Back of ID'}
-                </p>
+                <p className="absolute top-4 text-lg capitalize">{captureStage === 'front' ? 'Front of ID' : 'Back of ID'}</p>
                 <div className="relative w-full h-full flex items-center justify-center">
-                    <video ref={videoRef} autoPlay playsInline className="absolute top-0 left-0 w-full h-full object-cover">
-                        <track kind="captions" />
-                    </video>
+                    <video ref={videoRef} autoPlay playsInline className="absolute top-0 left-0 w-full h-full object-cover"><track kind="captions" /></video>
                     <div className="id-outline"></div>
                 </div>
             </main>
             
             <footer className="text-center p-4 space-y-4">
                 <p>Place your ID within the frame and take a picture</p>
-                <button
-                    onClick={handleCapture}
-                    className="w-16 h-16 bg-white rounded-full border-4 border-gray-400 focus:outline-none focus:ring-2 focus:ring-white"
-                    aria-label="Capture photo"
-                ></button>
+                <button type="button" onClick={handleCapture} className="w-16 h-16 bg-white rounded-full border-4 border-gray-400 focus:outline-none focus:ring-2 focus:ring-white" aria-label="Capture photo"></button>
                 <p className="text-gray-400 text-sm">Powered by ZOLOZ</p>
             </footer>
         </div>
@@ -379,15 +365,60 @@ CameraModal.propTypes = {
     onCapture: PropTypes.func.isRequired,
 };
 
-const SubmissionMessage = () => (
-    <div className="text-center py-10">
-        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-        </div>
-        <h2 className="text-2xl font-bold text-gray-800">Registration Submitted!</h2>
-        <p className="text-gray-600 mt-2">Thank you. Your information has been submitted for review.</p>
-    </div>
-);
+const Step5VerificationResult = ({ result, onRetry }) => {
+    // UPDATED: Automatically redirect on success to the mobile app
+    useEffect(() => {
+        if (result?.match) {
+            const timer = setTimeout(() => {
+                // This is a deep link that should open your React Native app
+                window.location.href = 'retroapp://login'; 
+            }, 3000); // 3-second delay
+
+            return () => clearTimeout(timer);
+        }
+    }, [result]);
+
+    if (!result) {
+        return (
+            <div className="text-center py-10">
+                <h2 className="text-2xl font-bold text-gray-800">Processing...</h2>
+                <p className="text-gray-600 mt-2">Please wait while we check your details.</p>
+            </div>
+        );
+    }
+
+    if (result.match) {
+        return (
+            <div className="text-center py-10">
+                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800">Registration Submitted!</h2>
+                <p className="text-gray-600 mt-2">Thank you. Your information has been submitted for final review.</p>
+                <p className="text-gray-600 mt-4 font-semibold">Attempting to open your mobile app to sign in...</p>
+                <p className="text-gray-500 mt-2 text-sm">If the app does not open automatically, please open it manually and sign in.</p>
+            </div>
+        );
+    } else {
+        return (
+            <div className="text-center py-10">
+                <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-16 h-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800">Verification Failed</h2>
+                <p className="text-gray-600 mt-2 mb-6">{result.details || "Your ID and selfie did not match. Please ensure your photos are clear and well-lit."}</p>
+                <button type="button" onClick={onRetry} className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700">
+                    Try Again
+                </button>
+            </div>
+        );
+    }
+};
+
+Step5VerificationResult.propTypes = {
+    result: PropTypes.object,
+    onRetry: PropTypes.func.isRequired,
+};
 
 
 const uploadImage = async (image, name, userId) => {
@@ -395,96 +426,69 @@ const uploadImage = async (image, name, userId) => {
     const file = dataURLtoFile(image, `${name}.jpg`);
     const filePath = `${userId}/${name}-${Date.now()}.jpg`;
     
-    const { error: uploadError } = await supabase.storage
-        .from('admin')
-        .upload(filePath, file);
+    const { error: uploadError } = await supabase.storage.from('admin').upload(filePath, file);
     
     if (uploadError) {
         console.error(`Error uploading ${name}:`, uploadError);
         throw uploadError;
     }
 
-    const { data: urlData } = supabase.storage
-        .from('admin')
-        .getPublicUrl(filePath);
-    
+    const { data: urlData } = supabase.storage.from('admin').getPublicUrl(filePath);
     return urlData.publicUrl;
+};
+
+// --- Validation Logic ---
+const validatePasswordComplexity = (password) => {
+    if (password.length < 8) return 'Password must be at least 8 characters.';
+    if (!/(?=.*[a-z])/.test(password)) return 'Password must contain a lowercase letter.';
+    if (!/(?=.*[A-Z])/.test(password)) return 'Password must contain an uppercase letter.';
+    if (!/(?=.*\d)/.test(password)) return 'Password must contain a number.';
+    if (!/(?=.*[!@#$%^&*])/.test(password)) return 'Password must contain a special character.';
+    return null;
+};
+
+const validateAge = (dateOfBirth) => {
+    if (!dateOfBirth) return 'Date of birth is required.';
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    if (age < 15) return 'You must be at least 15 years old.';
+    return null;
 };
 
 const validatePersonalInfo = (formData) => {
     const errors = {};
-    const { firstName, lastName, username, business_address, postalCode, date_of_birth, gender, email, phone_number, password, confirmPassword } = formData;
-
-    
-    if (!firstName) errors.firstName = 'First name is required.';
-    if (!lastName) errors.lastName = 'Last name is required.';
-    if (!username) {
-        errors.username = 'Username is required.';
-    } else if (username.length < 3) {
-        errors.username = 'Username must be at least 3 characters.';
-    }
-    if (!date_of_birth) errors.date_of_birth = 'Date of birth is required.';
-    if (!business_address) errors.business_address = 'Business address is required.';
-    if (!postalCode) errors.postalCode = 'Postal Code is required.';
-    if (!gender) errors.gender = 'Gender is required.';
-    if (!email) errors.email = 'Email is required.';
-    if (!phone_number) errors.phone_number = 'Phone number is required.';
-    if (!password) errors.password = 'Password is required.';
-    if (!confirmPassword) errors.confirmPassword = 'Confirm Password is required.';
-
-    if (postalCode && postalCode.length !== 4) {
-        errors.postalCode = 'Postal code must be 4 digits.';
-    }
-
-    
-    if (phone_number) { 
-        if (phone_number.length !== 11) {
-            errors.phone_number = 'Phone number must be 11 digits.';
-        } else if (!phone_number.startsWith('0')) {
-            errors.phone_number = 'Phone number must start with 0.';
-        }
-    }
-    
-    // Password validation
-    if (password) {
-        if (password.length < 8) {
-            errors.password = 'Password must be at least 8 characters.';
-        } else if (!/(?=.*[a-z])/.test(password)) {
-            errors.password = 'Password must contain a lowercase letter.';
-        } else if (!/(?=.*[A-Z])/.test(password)) {
-            errors.password = 'Password must contain an uppercase letter.';
-        } else if (!/(?=.*\d)/.test(password)) {
-            errors.password = 'Password must contain a number.';
-        } else if (!/(?=.*[!@#$%^&*])/.test(password)) {
-            errors.password = 'Password must contain a special character.';
-        }
-    }
-    // Check password match
-    if (password && confirmPassword && password !== confirmPassword) {
-        errors.confirmPassword = 'Passwords do not match.';
-    }
-
-    // Age validation
-    if (date_of_birth) {
-        const birthDate = new Date(date_of_birth);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDifference = today.getMonth() - birthDate.getMonth();
-        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-        if (age < 15) {
-            errors.date_of_birth = 'You must be at least 15 years old.';
-        }
-    }
-
     const requiredFields = ['firstName', 'lastName', 'username', 'date_of_birth', 'business_address', 'postalCode', 'gender', 'email', 'phone_number', 'password', 'confirmPassword'];
-    const allRequiredFilled = requiredFields.every(field => formData[field]);
-    if (!allRequiredFilled && Object.keys(errors).length === 0) {
+    requiredFields.forEach(field => {
+        if (!formData[field]) {
+            const fieldName = field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+            errors[field] = `${fieldName} is required.`;
+        }
+    });
+
+    if (formData.username && formData.username.length < 3) errors.username = 'Username must be at least 3 characters.';
+    if (formData.postalCode && formData.postalCode.length !== 4) errors.postalCode = 'Postal code must be 4 digits.';
+    if (formData.phone_number) {
+        if (formData.phone_number.length !== 11) errors.phone_number = 'Phone number must be 11 digits.';
+        else if (!formData.phone_number.startsWith('0')) errors.phone_number = 'Phone number must start with 0.';
+    }
+    if (formData.password) {
+        const passwordError = validatePasswordComplexity(formData.password);
+        if (passwordError) errors.password = passwordError;
+        else if (formData.password !== formData.confirmPassword) errors.confirmPassword = 'Passwords do not match.';
+    }
+    const ageError = validateAge(formData.date_of_birth);
+    if (ageError) errors.date_of_birth = ageError;
+
+    if (requiredFields.every(field => formData[field]) && Object.keys(errors).length === 0) {
+        delete errors.form;
+    } else if (Object.keys(errors).length === 0) {
         errors.form = 'Please fill out all required fields.';
     }
-
-
     return errors;
 };
 
@@ -504,47 +508,46 @@ const validateIdVerification = (formData, idImages) => {
 
 
 // --- Main Page Component ---
-
 export default function RegistrationPage() {
     const [currentStep, setCurrentStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
-    const [formData, setFormData] = useState({
+    const initialFormData = {
         firstName: '', middleName: '', lastName: '',
         username: '',
         business_address: '', postalCode: '', date_of_birth: '',
         gender: '', email: '', phone_number: '', 
         idType: 'National ID (Card Type)',
         password: '', confirmPassword: ''
-    });
+    };
+    const [formData, setFormData] = useState(initialFormData);
     const [idImages, setIdImages] = useState({ front: null, back: null });
     const [selfieImage, setSelfieImage] = useState(null);
     const [idCaptureStage, setIdCaptureStage] = useState(null);
     const [errors, setErrors] = useState({});
+    const [verificationResult, setVerificationResult] = useState(null);
+    const idScanTimer = useRef(null);
+
+    const handleRetryVerification = () => {
+        setIdImages({ front: null, back: null });
+        setSelfieImage(null);
+        setVerificationResult(null);
+        setCurrentStep(2);
+    };
+
+    useEffect(() => {
+        return () => { if (idScanTimer.current) clearTimeout(idScanTimer.current); };
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         let processedValue = value;
-
-        if (name === 'postalCode' || name === 'phone_number') {
-            processedValue = value.replace(/\D/g, '');
-        }
-        
-        if (name === 'username') {
-            processedValue = value.replace(/\s/g, ''); // Prevent spaces in username
-        }
-
+        if (name === 'postalCode' || name === 'phone_number') processedValue = value.replace(/\D/g, '');
+        if (name === 'username') processedValue = value.replace(/\s/g, '');
         setFormData(prev => ({ ...prev, [name]: processedValue }));
-        
-        if (errors[name]) {
+        if (errors[name] || errors.form) {
             setErrors(prev => {
                 const newErrors = { ...prev };
                 delete newErrors[name];
-                return newErrors;
-            });
-        }
-        if (errors.form) {
-            setErrors(prev => {
-                const newErrors = { ...prev };
                 delete newErrors.form;
                 return newErrors;
             });
@@ -553,36 +556,29 @@ export default function RegistrationPage() {
     
     const validateStep = (step) => {
         let currentStepErrors = {};
-        if (step === 1) {
-            currentStepErrors = validatePersonalInfo(formData);
-        } else if (step === 2) {
-            currentStepErrors = validateIdVerification(formData, idImages);
-        }
-        
+        if (step === 1) currentStepErrors = validatePersonalInfo(formData);
+        else if (step === 2) currentStepErrors = validateIdVerification(formData, idImages);
         setErrors(currentStepErrors);
         return Object.keys(currentStepErrors).length === 0;
     };
 
     const goToStep = (step) => {
-        if (step > currentStep) {
-            if (!validateStep(currentStep)) {
-                return;
-            }
-        }
+        if (step > currentStep && !validateStep(currentStep)) return;
         setErrors({});
         setCurrentStep(step);
     };
 
     const handleStartScan = () => {
+        if (idScanTimer.current) clearTimeout(idScanTimer.current);
         setIdImages({ front: null, back: null });
         setIdCaptureStage('front');
     };
 
     const handleIdCapture = (image) => {
         setIdImages(prev => ({ ...prev, [idCaptureStage]: image }));
-        
         if (idCaptureStage === 'front' && formData.idType !== 'Passport') {
-            setIdCaptureStage('back');
+            setIdCaptureStage(null); 
+            idScanTimer.current = setTimeout(() => setIdCaptureStage('back'), 3000);
         } else {
             setIdCaptureStage(null);
         }
@@ -593,73 +589,101 @@ export default function RegistrationPage() {
             alert("Please take a selfie first.");
             return;
         }
+        
+        if (selfieImage === idImages.front) {
+            alert("The selfie image cannot be the same as the ID photo. Please upload a valid ID document and take a new selfie.");
+            return;
+        }
+
         goToStep(4);
     };
 
     const handleFinalSubmit = async () => {
         setIsLoading(true);
-
-        if (!supabase?.auth) {
-            alert("Supabase client is not configured correctly.");
-            setIsLoading(false);
-            return;
-        }
+        setVerificationResult(null);
 
         try {
-            // 1. Sign up user
-            const { data: authData, error: authError } = await supabase.auth.signUp({
-                email: formData.email,
-                password: formData.password,
-            });
-            
-            if (authError) throw authError;
-
-            const user = authData.user;
-            if (!user) throw new Error("User registration failed.");
-
-            // 2. Upload images
+            const tempUserId = `temp-${Date.now()}`;
             const [selfieUrl, idFrontUrl, idBackUrl] = await Promise.all([
-                uploadImage(selfieImage, 'selfie', user.id),
-                uploadImage(idImages.front, 'id-front', user.id),
-                formData.idType !== 'Passport' ? uploadImage(idImages.back, 'id-back', user.id) : null,
+                uploadImage(selfieImage, 'selfie', tempUserId),
+                uploadImage(idImages.front, 'id-front', tempUserId),
+                formData.idType !== 'Passport' ? uploadImage(idImages.back, 'id-back', tempUserId) : null,
             ]);
-
-            // 3. Insert user profile data
-            const { error: profileError } = await supabase
-                .from('users')
-                .insert({
-                    id: user.id,
-                    email: formData.email,
-                    username: formData.username,
-                    first_name: formData.firstName,
-                    middle_name: formData.middleName,
-                    last_name: formData.lastName,
-                    fullName: `${formData.firstName} ${formData.middleName || ''} ${formData.lastName}`.replace(/\s+/g, ' ').trim(),
-                    business_address: formData.business_address,
-                    postal_code: formData.postalCode,
-                    date_of_birth: formData.date_of_birth,
-                    gender: formData.gender,
-                    phone_number: formData.phone_number,
-                    id_type: formData.idType,
-                    selfie_image_url: selfieUrl,
-                    id_front_url: idFrontUrl,
-                    id_back_url: idBackUrl,
-                    status: 'pending_approval',
-                    role: 'user',
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                });
-
-            if (profileError) {
-                console.error("Error inserting profile data:", profileError);
-                throw profileError;
+            
+            if (!selfieUrl || !idFrontUrl) {
+                throw new Error("One or more images failed to upload. Cannot proceed with face verification.");
             }
 
+            console.log("Invoking face verification function...");
+            const { data: verificationData, error: verificationError } = await supabase.functions.invoke('verify-face', {
+                body: {
+                    selfieImageUrl: selfieUrl,
+                    idFrontUrl: idFrontUrl,
+                    userId: tempUserId,
+                    userData: {
+                        firstName: formData.firstName,
+                        lastName: formData.lastName,
+                        date_of_birth: formData.date_of_birth,
+                        gender: formData.gender
+                    },
+                    idType: formData.idType
+                },
+            });
+
+            if (verificationError) {
+                throw new Error(verificationError.message);
+            }
+            
+            setVerificationResult(verificationData);
+
+            if (verificationData?.match) {
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: formData.email,
+                    password: formData.password,
+                });
+                
+                if (authError) throw authError;
+
+                const user = authData.user;
+                if (!user) throw new Error("User registration failed after verification.");
+
+                const { error: profileError } = await supabase
+                    .from('users')
+                    .insert({
+                        id: user.id,
+                        email: formData.email,
+                        username: formData.username,
+                        first_name: formData.firstName,
+                        middle_name: formData.middleName,
+                        last_name: formData.lastName,
+                        fullName: `${formData.firstName} ${formData.middleName || ''} ${formData.lastName}`.replace(/\s+/g, ' ').trim(),
+                        business_address: formData.business_address,
+                        postal_code: formData.postalCode,
+                        date_of_birth: formData.date_of_birth,
+                        gender: formData.gender,
+                        phone_number: formData.phone_number,
+                        id_type: formData.idType,
+                        selfie_image_url: selfieUrl,
+                        id_front_url: idFrontUrl,
+                        id_back_url: idBackUrl,
+                        status: 'pending_approval',
+                        role: 'user',
+                        is_face_verified: true,
+                        face_match_score: verificationData.similarity,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                    });
+
+                if (profileError) throw profileError;
+            }
+            
             setCurrentStep(5);
 
         } catch (error) {
             console.error("Registration Error:", error);
             alert(`An error occurred during registration: ${error.message}`);
+            setVerificationResult({ match: false, details: error.message });
+            setCurrentStep(5);
         } finally {
             setIsLoading(false);
         }
@@ -676,7 +700,7 @@ export default function RegistrationPage() {
             case 4:
                 return <Step4Confirmation formData={formData} idImages={idImages} selfieImage={selfieImage} onConfirm={handleFinalSubmit} onBack={() => goToStep(3)} isLoading={isLoading} />;
             case 5:
-                return <SubmissionMessage />;
+                return <Step5VerificationResult result={verificationResult} onRetry={handleRetryVerification} onSuccessRedirect={() => { /* Handled by useEffect in Step5 */ }} />;
             default:
                 return null;
         }

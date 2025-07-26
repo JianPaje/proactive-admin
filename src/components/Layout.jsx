@@ -1,8 +1,8 @@
 import React, { useState } from 'react'; 
 import { Outlet, Navigate } from 'react-router-dom';
-import Sidebar from './sidebar';
-import Header from './Header'; 
-import { useAuth } from '../hook/useAuth';
+import Sidebar from './sidebar.jsx';
+import Header from './Header.jsx'; 
+import { useAuth } from '../hook/useAuth.js';
 
 const Layout = () => {
   const { user } = useAuth();
