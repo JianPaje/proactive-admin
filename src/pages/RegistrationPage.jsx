@@ -666,7 +666,7 @@ export default function RegistrationPage() {
                         selfie_image_url: selfieUrl,
                         id_front_url: idFrontUrl,
                         id_back_url: idBackUrl,
-                        status: 'pending_approval',
+                        status: 'Approved',
                         role: 'user',
                         is_face_verified: true,
                         face_match_score: verificationData.similarity,

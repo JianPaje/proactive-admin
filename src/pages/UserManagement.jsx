@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import UserDetailModal from '../components/UserDetailModal';
+import UserDetailModal from '../components/UserDetailModal.jsx';
 
+
+// Helper to get styling for different user statuses
 const getStatusClasses = (status) => {
   switch (status) {
-    case 'approved':
+    // UPDATED: Changed 'approved' to 'verified' to match your RLS policy
+    case 'verified':
+    case 'full verified': 
       return 'bg-green-100 text-green-800';
-    case 'fully_verified':
-      return 'bg-blue-100 text-blue-800';
     case 'pending_approval':
       return 'bg-yellow-100 text-yellow-800';
-    case 'suspended':
+    case 'suspend': 
       return 'bg-purple-100 text-purple-800';
     default:
       return 'bg-red-100 text-red-800';
@@ -44,31 +46,38 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  
   const handleUpdateStatus = async (userId, newStatus) => {
     if (!window.confirm(`Are you sure you want to set this user's status to "${newStatus}"?`)) {
       return;
     }
+    
     try {
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ status: newStatus })
-        .eq('id', userId);
-      if (updateError) throw updateError;
-      
+      if (newStatus === 'suspend') {
+        const { error: functionError } = await supabase.functions.invoke('suspend-user', {
+          body: { userIdToSuspend: userId },
+        });
+        if (functionError) throw functionError;
+      } else {
+        const { error: updateError } = await supabase
+          .from('users')
+          .update({ status: newStatus })
+          .eq('id', userId);
+        if (updateError) throw updateError;
+      }
+
       const updatedUsers = users.map(user =>
         user.id === userId ? { ...user, status: newStatus } : user
       );
       setUsers(updatedUsers);
 
-    
       if (selectedUser && selectedUser.id === userId) {
         setSelectedUser(prevUser => ({ ...prevUser, status: newStatus }));
       }
 
       alert(`User status updated to ${newStatus}.`);
+
     } catch (err) {
-      alert('Failed to update user status.');
+      alert(`Failed to update user status: ${err.message}`);
       console.error(err);
     }
   };
@@ -84,8 +93,7 @@ const UserManagement = () => {
   };
   
   const handleFullVerification = (userId) => {
-    handleUpdateStatus(userId, 'fully_verified');
-  
+    handleUpdateStatus(userId, 'full verified');
   };
 
   const filteredUsers = users.filter(user =>
@@ -138,18 +146,20 @@ const UserManagement = () => {
                 </td>
                 <td className="px-5 py-4 border-b text-sm">
                   <div className="flex items-center space-x-4">
-                    <button onClick={() => handleViewDetails(user)} className="text-gray-500 hover:text-blue-600" title="View Details">
+                    <button type="button" onClick={() => handleViewDetails(user)} className="text-gray-500 hover:text-blue-600" title="View Details">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                         <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                       </svg>
                     </button>
-                    {user.status === 'suspended' ? (
-                      <button onClick={() => handleUpdateStatus(user.id, 'approved')} className="text-green-600 hover:underline">
+                    {/* UPDATED: Check for 'suspend' status */}
+                    {user.status === 'suspend' ? (
+                      // UPDATED: Set status to 'verified' on reactivate
+                      <button type="button" onClick={() => handleUpdateStatus(user.id, 'verified')} className="text-green-600 hover:underline">
                         Reactivate
                       </button>
                     ) : (
-                      <button onClick={() => handleUpdateStatus(user.id, 'suspended')} className="text-red-600 hover:underline">
+                      <button type="button" onClick={() => handleUpdateStatus(user.id, 'suspend')} className="text-red-600 hover:underline">
                         Suspend
                       </button>
                     )}
