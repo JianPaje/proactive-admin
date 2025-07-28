@@ -24,7 +24,7 @@ serve(async (req) => {
         'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
       },
       body: JSON.stringify({
-        from: 'RetroConnect <noreply@yourverifieddomain.com>', // IMPORTANT: Replace with your verified Resend domain
+        from: 'RetroConnect <noreply@retroconnect.app>',
         to: [reportedUser.email],
         bcc: [reporter.email],
         subject: `Update on your recent report on RetroConnect`,
