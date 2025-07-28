@@ -1,14 +1,13 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 
-// Define CORS headers to allow requests from any origin
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*', 
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 serve(async (req) => {
-  // This is a preflight request. It's a security check browsers do before the actual request.
-  // We need to respond with the CORS headers to let it proceed.
+ 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -16,7 +15,7 @@ serve(async (req) => {
   try {
     const { reportedUser, reporter, message, reason } = await req.json();
 
-    // --- Send Email with Resend ---
+  
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -24,7 +23,7 @@ serve(async (req) => {
         'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
       },
       body: JSON.stringify({
-        from: 'RetroConnect <retroconnect.app>',
+        from: 'RetroConnect <noreply@retroconnect.app>',
         to: [reportedUser.email],
         bcc: [reporter.email],
         subject: `Update on your recent report on RetroConnect`,
