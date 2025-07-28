@@ -2,7 +2,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 
 // Define CORS headers to allow requests from any origin
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*', // Allows any origin
+  'Access-Control-Allow-Origin': '*', 
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
@@ -24,7 +24,7 @@ serve(async (req) => {
         'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
       },
       body: JSON.stringify({
-        from: 'RetroConnect <noreply@yourdomain.com>', // IMPORTANT: Replace with your verified Resend domain
+        from: 'RetroConnect <retroconnect.app>',
         to: [reportedUser.email],
         bcc: [reporter.email],
         subject: `Update on your recent report on RetroConnect`,
@@ -54,7 +54,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    // Also include CORS headers in the error response
+    
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
