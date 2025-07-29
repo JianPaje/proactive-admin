@@ -1,16 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo.png'; // Make sure this path is correct
 
 const AboutUs = () => {
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen font-sans">
       {/* Navigation Bar */}
       <nav className="bg-white shadow-sm p-4">
-        <div className="container mx-auto flex items-center justify-center">
+        <div className="container mx-auto flex items-center justify-center relative">
           <Link to="/" className="flex items-center">
-            <img src={logo} alt="RetroConnect Logo" className="h-10 mr-3" />
-            <span className="text-xl font-bold text-gray-800">RetroConnect</span>
+            <img src={logo} alt="ProActive Logo" className="h-12 mr-3" />
+            <span className="text-xl font-bold text-gray-800">ProActive</span>
           </Link>
         </div>
       </nav>
@@ -18,49 +18,49 @@ const AboutUs = () => {
       {/* Page Content */}
       <div className="container mx-auto p-8 md:p-16">
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">
-          About RetroConnect
+          About ProActive
         </h1>
 
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md space-y-6">
 
           <div>
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">About Us</h2>
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">About The Project</h2>
             <p className="text-gray-600 leading-relaxed">
-              We are a team of 3rd-year students from AMA Computer College Fairview (AMACC-Fairview). We developed RetroConnect as an innovative application to empower users to easily buy, sell, and even barter both brand new and pre-owned items. Our goal is to provide a seamless and secure platform that promotes a sustainable circular economy within the Filipino community.
+              "ProActive: Gamifying Student Discipline and Efficiency" was developed by Peter Allen Soriano, Rene Capulan, and Jian Paje, students of AMA Computer College Fairview. This project addresses modern challenges like procrastination and disengagement by transforming routine academic tasks into an interactive and motivating game.
             </p>
           </div>
 
           <div>
             <h2 className="text-2xl font-semibold text-gray-700 mb-4">Our Mission</h2>
             <p className="text-gray-600 leading-relaxed">
-              RetroConnect is a mobile e-commerce application designed to provide a versatile platform for Filipino users to buy, sell, and barter both new and secondhand items. Our objective is to enhance the online shopping experience for Filipino consumers by introducing unique features and creating a user-centric platform that addresses specific needs within the local e-commerce landscape.
+              Our primary objective is to assess and improve student engagement, discipline, and productivity through gamification. We aim to convert tedious assignments and responsibilities into engaging challenges, fostering better time management, self-discipline, and a more positive attitude towards academic and extracurricular activities.
             </p>
           </div>
 
           <div>
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">A New Concept in E-Commerce</h2>
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">A New Approach to Student Engagement</h2>
             <p className="text-gray-600 leading-relaxed">
-              We aim to revolutionize the way users interact with e-commerce by breaking the mold of traditional monetary transactions. RetroConnect introduces innovative features that foster a community-driven marketplace and encourage sustainable consumption.
+              We believe that the motivational principles found in gaming—achievements, leaderboards, and rewards—can be powerfully applied to student life. ProActive bridges the gap between entertainment and education, creating a tool that is both fun to use and effective in building essential life skills for the mobile-first generation.
             </p>
           </div>
 
           <div>
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Our Unique Features</h2>
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Core Features</h2>
             <ul className="list-disc list-inside text-gray-600 space-y-2">
               <li>
-                Barter System: Enabling users to exchange items directly without the need for money, facilitating a unique way to trade.
+                <strong>Daily & Side Quests:</strong> Turning homework, attendance, and other responsibilities into completable quests.
               </li>
               <li>
-                Local Pick-up Map: Allowing users to easily find and transact with sellers in their local area for urgent needs and in-person item verification.
+                <strong>Points & Rewards System:</strong> Students gain points and unlock achievements for completing tasks, reinforcing positive behavior.
               </li>
               <li>
-                Repair and Upcycling Services: Connecting users with nearby repair shops to fix and give new life to secondhand goods.
+                <strong>Ranking System & Leaderboards:</strong> Fostering healthy competition and a sense of progression by allowing students to climb the ranks.
               </li>
               <li>
-                sell or Donate Option: Providing a convenient way for sellers to declutter by listing unsold items as donations for the community.
+                <strong>Event-Based Challenges:</strong> Special events to encourage participation in extracurriculars and other school activities.
               </li>
               <li>
-                Social Sharing & Communication: Building trust and community through shared item photos, reviews, and direct video/text communication between buyers and sellers.
+                <strong>Admin & Teacher Portals:</strong> Allowing school staff to monitor student progress, create custom tasks, and manage the system.
               </li>
             </ul>
           </div>

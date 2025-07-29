@@ -1,7 +1,7 @@
 // src/pages/LoginPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hook/useAuth';
+import { useAuth } from '../hook/useAuth.js';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');

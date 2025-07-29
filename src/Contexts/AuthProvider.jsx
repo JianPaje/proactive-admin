@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { supabase } from '../supabaseClient';
-import { AuthContext } from './AuthContext';
+import { supabase } from '../supabaseClient.js';
+import { AuthContext } from './AuthContext.js';
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);

@@ -2,20 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient.js';
 import UserDetailModal from '../components/UserDetailModal.jsx';
 
-
-// Helper to get styling for different user statuses
-const getStatusClasses = (status) => {
-  switch (status) {
-    case 'verified':
-    case 'fully_verified': // CORRECTED: from 'full verified'
-      return 'bg-green-100 text-green-800';
-    case 'suspended': 
-      return 'bg-purple-100 text-purple-800';
-    default:
-      return 'bg-red-100 text-red-800';
-  }
-};
-
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +14,9 @@ const UserManagement = () => {
     setLoading(true);
     setError('');
     try {
-      const { data, error: fetchError } = await supabase.from('users').select('*');
+      // Assuming you might have a 'role' column in your 'users' table.
+      // If not, you can remove it from the select query.
+      const { data, error: fetchError } = await supabase.from('users').select('*, role');
       if (fetchError) throw fetchError;
       setUsers(data || []);
     } catch (err) {
@@ -90,7 +78,8 @@ const UserManagement = () => {
   };
   
   const handleFullVerification = (userId) => {
-    handleUpdateStatus(userId, 'fully_verified'); // CORRECTED: from 'full verified'
+    // Mapping "Approve" button to the 'fully_verified' status
+    handleUpdateStatus(userId, 'fully_verified');
   };
 
   const filteredUsers = users.filter(user =>
@@ -98,27 +87,6 @@ const UserManagement = () => {
     (user.username?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
   
-  // Component for rendering action buttons based on user status
-  const ActionButtons = ({ user }) => {
-    switch (user.status) {
-      case 'suspended':
-        return (
-          <button type="button" onClick={() => handleUpdateStatus(user.id, 'fully_verified')} className="text-green-600 hover:underline">
-            Reactivate
-          </button>
-        );
-      case 'verified':
-      case 'fully_verified': // CORRECTED: from 'full verified'
-        return (
-          <button type="button" onClick={() => handleUpdateStatus(user.id, 'suspended')} className="text-red-600 hover:underline">
-            Suspend
-          </button>
-        );
-      default:
-        return null;
-    }
-  };
-
   if (loading) return <div>Loading users...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
 
@@ -134,53 +102,66 @@ const UserManagement = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
-      <div className="bg-white shadow-md rounded-lg overflow-x-auto">
-        <table className="min-w-full leading-normal">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Email</th>
-              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Display Name</th>
-              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Registered On</th>
-              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Status</th>
-              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Face Verified</th>
-              <th className="px-5 py-3 border-b-2 text-left text-xs font-semibold uppercase">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.length > 0 ? filteredUsers.map(user => (
-              <tr key={user.id} className="hover:bg-gray-50">
-                <td className="px-5 py-4 border-b text-sm">{user.email}</td>
-                <td className="px-5 py-4 border-b text-sm">{user.username || 'N/A'}</td>
-                <td className="px-5 py-4 border-b text-sm">{user.created_at ? new Date(user.created_at).toLocaleString() : 'N/A'}</td>
-                <td className="px-5 py-4 border-b text-sm">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(user.status)}`}>
-                    {user.status ? user.status.replace(/_/g, ' ') : 'N/A'}
-                  </span>
-                </td>
-                <td className="px-5 py-4 border-b text-sm">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.is_face_verified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {user.is_face_verified ? 'Yes' : 'No'}
-                  </span>
-                </td>
-                <td className="px-5 py-4 border-b text-sm">
-                  <div className="flex items-center space-x-4">
-                    <button type="button" onClick={() => handleViewDetails(user)} className="text-gray-500 hover:text-blue-600" title="View Details">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                    <ActionButtons user={user} />
-                  </div>
-                </td>
-              </tr>
-            )) : (
-              <tr>
-                <td colSpan="6" className="text-center py-4">No users found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+
+      {/* Card Grid Layout */}
+      <div className="grid grid-cols-1 gap-6">
+        {filteredUsers.length > 0 ? filteredUsers.map(user => (
+          // Single User Card
+          <div key={user.id} className="bg-white shadow-md rounded-lg p-4 flex items-center justify-between">
+            
+            {/* Left Side: User Info */}
+            <div className="flex items-center space-x-4">
+              {/* Avatar Placeholder */}
+              <div className="flex-shrink-0">
+                 <svg className="h-16 w-16 text-gray-300 rounded-full" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                 </svg>
+              </div>
+              
+              {/* Text Details */}
+              <div className="flex-grow">
+                <div>
+                  <span className="font-bold text-sm text-gray-600">Full Name</span>
+                  <p className="text-gray-900 font-medium">{user.username || 'N/A'}</p>
+                </div>
+                <div className="mt-2">
+                  <span className="font-bold text-sm text-gray-600">LRN/USN</span>
+                  {/* NOTE: Using a placeholder as 'role' or 'LRN' is not in the original code */}
+                  <p className="text-gray-700">{user.role || 'Student User'}</p> 
+                </div>
+                <button
+                  onClick={() => handleViewDetails(user)}
+                  className="text-sm text-blue-600 hover:underline mt-2"
+                >
+                  User Details
+                </button>
+              </div>
+            </div>
+
+            {/* Right Side: Action Buttons */}
+            <div className="flex flex-col space-y-2">
+               {/* "Approve" maps to fully verified status */}
+               <button
+                 onClick={() => handleFullVerification(user.id)}
+                 className="px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+               >
+                 Approve
+               </button>
+               {/* "Deny" maps to suspended status */}
+               <button
+                 onClick={() => handleUpdateStatus(user.id, 'suspended')}
+                 className="px-6 py-2 bg-gray-200 text-gray-800 text-sm font-semibold rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
+               >
+                 Deny
+               </button>
+            </div>
+
+          </div>
+        )) : (
+          <div className="text-center py-4">
+              <p>No users found.</p>
+          </div>
+        )}
       </div>
 
       {isModalOpen && selectedUser && (
