@@ -1,7 +1,7 @@
 import React from 'react';
 // Make sure you have a logo file at this path
 import logo from '../assets/0.png'; 
-import appScreenshot from '../assets/imageBackground.png';
+import appScreenshot from '../assets/ImageBackground.png';
 
 const HomePage = () => {
   return (
