@@ -32,7 +32,7 @@ const HomePage = () => {
             </p>
             <div className="flex justify-center md:justify-start space-x-4">
               {/* NOTE: You will need to replace "#" with your actual Android APK download link. */}
-              <a href="https://expo.dev/artifacts/eas/s5WDurPqdEfauKMXX67i5F.apk" className="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
+              <a href="https://expo.dev/artifacts/eas/qRQAr86FSm35PtWZZmtuZB.apk" className="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
                 Download for Android
               </a>
               <a href="/about" className="bg-transparent text-blue-600 font-bold py-3 px-6 rounded-lg border border-blue-600 hover:bg-blue-600 hover:text-white transition duration-300">
